@@ -16,7 +16,7 @@ const leftRectIndent = squareSideHalf - radius;
 const rightRectIndent = leftRectIndent + diameter;
 
 //Поменять
-let limit = 1;
+let limit = 7;
 //
 const indent = (canvasH - row * squareSide) / 2;
 
@@ -150,6 +150,31 @@ function findInDoubleArr(arr, el) {
     return null;
 }
 
+function drawAndFallChip(arr, playerNum, area){
+    let pair = findInDoubleArr(arr, area);
+    let n = pair.i;
+    let m = pair.j;
+    let i = n;
+    let pace = 100;
+    setTimeout(() => {clearCircle(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
+    while (i < row - 1 && arr[i][m].busy === 0) {
+        i++;
+
+    }
+    if (arr[i][m].busy !== 0){
+        i--;
+    }
+    for (let k = n + 1; k < i; k++){
+        setTimeout(() => {drawCircle(arr[k][m].x1, arr[k][m].y1, radius, diameter, curPlayer.color);},  -100 + pace);
+        setTimeout(() => {clearCircle(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);}, 50 + pace);
+        pace += 150;
+    }
+
+    arrayRect[i][m].busy = playerNum;
+    setTimeout(() => {drawCircle(arr[i][m].x1, arr[i][m].y1, radius, diameter, curPlayer.color);}, pace)
+    curPlayer.lastPos = {i: i, j: m};
+    currentArea = false;
+}
 
 
 canvas.onmousemove = function (e) {
@@ -277,31 +302,5 @@ function fromRectToNum(arr) {
     return num;
 }
 
-function drawAndFallChip(arr, playerNum, area){
-    let pair = findInDoubleArr(arr, area);
-    let n = pair.i;
-    let m = pair.j;
-    let i = n;
-    clearCircle(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);
-    while (i < row - 1 && arr[i][m].busy === 0) {
-        i++;
-        // drawCircle()
-    }
-    if (arr[i][m].busy !== 0){
-        i--;
-    }
-    arrayRect[i][m].busy = playerNum;
-    drawCircle(arr[i][m].x1, arr[i][m].y1, radius, diameter, curPlayer.color);
-    curPlayer.lastPos = {i: i, j: m};
-    currentArea = false;
-}
 
-// function drawAndSaveCircle(array, area, playerNum) {
-//
-//     // fall(array, n.i, n.j, playerNum);
-//     // console.log("i = " + n.i + " j = "+ n.j);
-//     // clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
-//     // drawCircle(area.x1, area.y1, radius, diameter, curPlayer.color);
-//     // arrayRect[n.i][n.j].busy = playerNum;
-//
-// }
+

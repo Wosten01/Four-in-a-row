@@ -121,21 +121,17 @@ function findAreaWithPlayersChip(arrayRect, x, y, chip, pos){
 }
 
 
-let exist = false;
-
 function runCircle(area, x, y) {
     if (between(area, x, y)){
-        if (!exist){
-            drawCircle(area.x1, area.y1, radius, diameter, curPlayer.color);
-            exist = true;
+        // if (!exist){
+        drawCircle(area.x1, area.y1, radius, diameter, curPlayer.color);
             // console.log("x= " + x + ", y = " + y);
             // console.log(area);
-        }
+        // }
     }
     else {
        clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
        currentArea = false;
-       exist = false;
     }
 }
 
@@ -175,7 +171,6 @@ function drawAndFallChip(arr, playerNum, area){
     curPlayer.lastPos = {i: i, j: m};
     currentArea = false;
 }
-
 
 canvas.onmousemove = function (e) {
     let x = e.pageX - canvas.offsetLeft;
@@ -273,7 +268,6 @@ let playerQueue = new Queue();
 playerQueue.enqueue(player2);
 playerQueue.enqueue(player1);
 
-
 let curChips = 0;
 
 //Не забыть что эта строчка нужна лишь при отсутствии класса игры
@@ -289,7 +283,6 @@ function changePlayer() {
     playerQueue.enqueue(curPlayer);
     // console.log(curPlayer);
 }
-
 
 function fromRectToNum(arr) {
     let num = [];

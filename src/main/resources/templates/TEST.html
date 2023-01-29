@@ -1,0 +1,280 @@
+<!--<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Test_page</title>
+    </head>
+
+
+    <body>
+
+
+    <h1>Hello</h1>
+    <h2 id="moss">moss</h2>
+    <p>hello hello</p>
+
+    <!-- Упорядоченный и неупорядоченный списки -->
+    <ul>
+        <li>js
+        <ul>
+            <li>x</li>
+            hello
+            <li>
+                <ul>
+                    <li>y</li>
+                    <li>z</li>
+                </ul>
+            </li>
+        </ul>
+        </li>
+    </ul>
+
+    <!-- Ссылка на сайт вне проекта -->
+    <p><a href="https://google.com">GOOGLE</a></p>
+
+    <!-- Ссылка внутри проекта -->
+    <p><a href="greeting.html">html</a></p>
+
+    <!-- Таблица -->
+
+    <table>
+        <tr>
+            <td>Строка 1, ячейка 1</td>
+            <td>Строка 1, ячейка 2</td>
+            <td>Строка 1, ячейка 3</td>
+        </tr>
+        <tr>
+            <td colspan="2">Строка 2, ячейка 1</td>
+            <td>Строка 2, ячейка 2</td>
+            <td>Строка 2, ячейка 3</td>
+        </tr>
+        <tr>
+            <td>Строка 3, ячейка 1</td>
+            <td>Строка 3, ячейка 2</td>
+            <td>Строка 3, ячейка 3</td>
+        </tr>
+        <tr>
+            <td>Строка 4, ячейка 1</td>
+            <td>Строка 4, ячейка 2</td>
+            <td>Строка 4, ячейка 3</td>
+        </tr>
+    </table>
+
+    <!-- Таблица с выделенным границами -->
+
+    <table border="1">
+        <tr>
+            <th>Заголовок столбца 1</th>
+            <th>Заголовок столбца 2</th>
+            <th>Заголовок столбца 3</th>
+        </tr>
+        <tr>
+            <td>Строка 2, ячейка 1</td>
+            <td colspan="2">Строка 2, ячейка 2, также захватывается Строка 2, ячейка 3</td>
+        </tr>
+        <tr>
+            <td rowspan="2">Строка 3, ячейка 1, также захватывается Строка 4, ячейка 1</td>
+            <td>Строка 3, ячейка 2</td>
+            <td>Строка 3, ячейка 3</td>
+        </tr>
+        <tr>
+            <td>Строка 4, ячейка 2</td>
+            <td>Строка 4, ячейка 3</td>
+        </tr>
+    </table>
+
+
+    <table summary="Брачные привычки цикад, демонстрирующие особенности по сравнению с саранчой">
+        <caption>Брачные особенности цикад</caption>
+        <colgroup>
+            <col />
+            <col class="alternate" />
+            <col />
+        </colgroup>
+        <tr>
+            <td>Это</td>
+            <td>То</td>
+            <td>Другое</td>
+        </tr>
+        <tr>
+            <td>Птичка</td>
+            <td>Крокодил</td>
+            <td>Завтрак</td>
+        </tr>
+    </table>
+
+    <!-- Словарь / Глоссарий -->
+
+    <h1>Несколько случайных словарных статей</h1>
+    <dl>
+        <dt>HTML</dt>
+        <dd>Аббревиатура от HyperText Markup Language – язык для создания веб-страниц.</dd>
+
+        <dt>Собака</dt>
+        <dd>Любое хищное животное из семейства Canidae.</dd>
+        <dd>Одомашненная разновидность животного семейства Canidae, Canis lupus familiaris.</dd>
+
+        <dt>Молоко</dt>
+        <dt>Кошачье пиво</dt>
+        <dd>Белая жидкость, которую производят коровы и которую люди использую в пищу.</dd>
+    </dl>
+
+    <!-- Просто форма -->
+
+    <form action="">
+        <input type="submit" text="Kringe"/>
+    </form>
+
+    <!-- Изображение -->
+
+    <div>
+        <img id="kate" src="kate.jpeg" width="405" height="405" alt="Something goes wrong" />
+    </div>
+
+    <!-- Выбор из нескольких вариантов -->
+    вшму
+    <select>
+        <option value="first option">Опция 1</option>
+        <option value="second option">Опция 2</option>
+        <option value="third option">Опция 3</option>
+        <option value="mouse" selected="selected">Грызун</option>
+    </select>
+
+    <!-- Форма со сбором данных -->
+    <form action="" method="post">
+        <p>Имя:</p>
+        <p><input type="text" name="name" value="Ваше имя" /></p>
+        <p>Комментарий: </p>
+        <p><textarea name="comments" rows="5" cols="20">Ваш комментарий</textarea></p>
+        <p>Вы:</p>
+        <p><input type="radio" name="areyou" value="male" /> Мужчина</p>
+        <p><input type="radio" name="areyou" value="female" /> Женщина</p>
+        <p><input type="radio" name="areyou" value="hermaphrodite" /> Ни то ни другое</p>
+        <p><input type="submit" /></p>
+        <p><input type="reset" /></p>
+        <input type="hidden" />
+<!--        хз зачем нужен хидден-->
+    </form>
+
+    <!-- Ссылка со скриптом -->
+
+    <div>
+        <a href="#kate" onclick="alert ('ух ты. Javascript.')">Нажми сюда</a>
+    </div>
+
+
+
+    <p><a href="#moss">return to moss</a></p>
+
+    <!-- Аббревиатуры -->
+
+    <p>
+        Этот вебсайт посвящен <abbr title="HyperText Markup Language">HTML</abbr> и
+        <acronym title="Телеграфное агентство Советского Союза">ТАСС</acronym>.
+    </p>
+
+    <!--Цитаты-->
+
+    <p>
+        Я спросил Сергея о цитатах, и он ответил
+        <cite>О цитатах я знаю столько же сколько и о мышлении птиц</cite>.
+        К счастью я нашел хороший учебник...
+    </p>
+
+    <blockquote title="Из учебника">
+        <p>
+            Теги blockquote, q и cite используются для определения цитат.
+            Тег blockquote создает блочный элемент и используется для определения больших цитат,
+            в то время как тег q создает строчный элемент и используется для цитат небольшого размера.
+        </p>
+    </blockquote>
+
+    <!--Отображение кода-->
+
+    <code>
+        <var>param</var> = true;
+    </code>
+
+    <pre>
+       &lt;div id="intro"&gt;
+       &lt;h1&gt;Заголовок&lt;/h1&gt;
+       &lt;p&gt;Параграфный параграф.&lt;/p&gt;
+       &lt;/div&gt;
+    </pre>
+
+    <!-- Определения -->
+    <p>
+        <dfn title="Мутация, при которой сочетается два или больше наборов хромосом представителей разных видов">Аллополиплоид</dfn> - это…
+    </p>
+
+    <!-- Адресс -->
+
+    <address>
+        г. Гдеград<br />
+        ул. Кудыкина<br />
+        д. 160, кв. 8
+    </address>
+
+    <!-- Отслеживание введенных символов? -->
+
+    <p>
+        Теперь введите: <kbd>здорово</kbd>
+    </p>
+
+    <!-- Правки -->
+
+    <p>
+        Очевидно, что это <del datetime="20030522">чепуха</del> <ins cite="http://www.msiter.ru">очень информативна</ins>.
+    </p>
+
+    <!-- Метки -->
+
+    <form action="">
+        <label for="yourName">Ваше имя</label>
+        <input type="text" name="yourName" id="yourName" />
+    </form>
+
+    <!-- Прикольные окошки объединения -->
+
+    <form action='' >
+        <fieldset>
+            <legend>Поле данных</legend>
+            <p>Имя <input type="text" name="firstName" /></p>
+            <p>Фамилия <input type="text" name="lastName" /></p>
+        </fieldset>
+        <fieldset>
+            <legend>Адрес</legend>
+            <p>Адрес <textarea name="address" ></textarea></p>
+            <p>Индекс <input type="text" name="postcode" /></p>
+        </fieldset>
+    </form>
+
+    <!-- Выпадающее окно с выбором вариантов и категориями-->
+
+    <select name="country">
+        <optgroup label="Африка">
+            <option value="gam">Гамбия</option>
+            <option value="mad">Мадагаскар</option>
+            <option value="nam">Намибия</option>
+        </optgroup>
+        <optgroup label="Европа">
+            <option value="fra">Франция</option>
+            <option value="rus">Россия</option>
+            <option value="uk">Великобритания</option>
+        </optgroup>
+        <optgroup label="Северная Америка">
+            <option value="can">Канада</option>
+            <option value="mex">Мексика</option>
+            <option value="usa">США</option>
+        </optgroup>
+    </select>
+
+    <input type="text" name="firstName" accesskey="f" tabindex="1" />
+
+    <footer>
+        <p>© 2018 Gandalf</p>
+    </footer>
+
+    </body>
+</html>

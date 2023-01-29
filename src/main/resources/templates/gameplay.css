@@ -1,0 +1,52 @@
+* {
+    font-family: "Century Gothic", monospace;
+    background: lightyellow;
+    color: darksalmon;
+}
+
+#return {
+    /*text-anchor: end;*/
+    text-align: center;
+    /*text-align: left;*/
+    font-size: 1.2em;
+    /*padding-top: 3em;*/
+    /*padding-left: 2em;*/
+    font-style: italic;
+    font-weight: lighter;
+
+    border:1px solid #000000;
+}
+
+#return a {
+    text-decoration: none;
+}
+#return a:hover{
+    text-align: right;
+    color: #875235;
+}
+
+/*#header {*/
+/*    font-size: 4em;*/
+/*    font-style: italic;*/
+/*    font-weight: bold;*/
+/*    text-align: center;*/
+/*}*/
+#gamePanel {
+    border:1px solid #000000;
+    text-align: center;
+    /*width="200";*/
+    /*height="100";*/
+}
+
+#gamePanel canvas{
+    border:1px solid #000000;
+    text-align: center;
+    /*width="200";*/
+    /*height="100";*/
+}
+
+#infoPanel{
+    text-align: center;
+    font-size: 0.9em;
+
+}

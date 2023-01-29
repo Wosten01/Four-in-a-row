@@ -1,0 +1,45 @@
+* {
+    font-family: "Century Gothic", monospace;
+    background: lightyellow;
+    color: darksalmon;
+}
+
+#menu {
+    font-size: 1.4em;
+    text-align: center;
+}
+
+#menu a{
+    text-decoration: none;
+    font-size: 0.85em;
+    font-style: italic;
+}
+/*E9967AFF*/
+#menu a:hover {
+    color: #875235;
+}
+
+#menu legend{
+    font-size: 6em;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+}
+
+/*#menu legend:hover{*/
+/*    font-size: 6em;*/
+/*}*/
+
+#menu fieldset {
+    border-style: none;
+    padding-top: 2em;
+}
+
+
+footer {
+    font-size: 0.5em;
+    text-align: center;
+    padding-top: 8em;
+}
+
+

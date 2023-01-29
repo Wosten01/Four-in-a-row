@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="gameplay.css">
+
+    <title>Gameplay</title>
+</head>
+<body>
+
+    <div id="gamePanel">
+        <canvas id="canvas" width="560" height="560">
+<!--            <script src="gameplay.js" type="text/javascript"></script>-->
+            <script type="text/javascript" src="gameplay.js"></script>
+            <noscript>Sorry, your browser does not support JavaScript!</noscript>
+        </canvas>
+<!--        <canvas id="stockGraph" width="150" height="150">-->
+<!--            <img src="kate.jpeg" width="405" height="405" alt=""/>-->
+<!--        </canvas>-->
+
+    </div>
+    <div id="infoPanel">
+        <p>
+            Some information
+        </p>
+    </div>
+
+
+    <div id="return">
+        <a href="greeting.html">Return to menu</a>
+    </div>
+
+    <div>
+<!--        Добавить возможность при нажатии на Enter вызывать функцтю-->
+        <button id="button" onclick="changePlayer()">
+            Submit
+        </button>
+    </div>
+
+</body>
+</html>

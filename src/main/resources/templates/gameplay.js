@@ -18,7 +18,7 @@ const indent = (canvasH - row * squareSide) / 2;
 let limit = 7;
 
 const playerColor1 = "rgba(245,245,245,1)";
-const playerColor2 = "rgb(249,205,205)";
+const playerColor2 = "rgba(249,205,205,1)";
 const fieldColor = "rgba(244,172,100,0.8)";
 let lineColor = "rgba(256,0,100,0.4)";
 //Разобраться как работает
@@ -124,12 +124,13 @@ function findInDoubleArr(arr, el) {
     return null;
 }
 
-function drawAndFallChip(arr, playerNum, area, color){
+function drawAndFallChip(chip, area, color){
+    //Переписать этот кринж с поиском пары и шизу с arr
+    let arr = field;
     let pair = findInDoubleArr(arr, area);
     let n = pair.i;
     let m = pair.j;
     let i = n;
-
     while (i < row - 1 && arr[i][m].busy === 0) {
         i++;
     }
@@ -137,8 +138,8 @@ function drawAndFallChip(arr, playerNum, area, color){
         i--;
     }
 
-    field.busy = playerNum;
-    game.numArr[i][m].busy = playerNum;
+    field[i][m].busy = chip;
+    game.nums[i][m] = chip;
     game.player.lastPos = {i: i, j: m};
     currentArea = undefined;
     game.player.numOfMoves++;
@@ -165,7 +166,7 @@ function drawAndFallChip(arr, playerNum, area, color){
                 let pix;
                 for (let i = 0; i < row; i++){
                     for (let j = 0; j < row; j++){
-                        if (field[i][j].busy === playerNum){
+                        if (field[i][j].busy === chip){
                             pix = ctx.getImageData(field[i][j].x1 + radius, field[i][j].y1 + radius, 1, 1).data;
                             if (pix[0] !== color[0]*1 && pix[1] !== color[1]*1 && pix[2] !== color[2]*1){
                                 drawCircle(arr[i][j].x1, arr[i][j].y1, radius, diameter, color);
@@ -196,12 +197,11 @@ canvas.onmousemove = function (e) {
             currentArea = undefined;
         }
     }
-    // console.log(currentArea);
 }
 
 canvas.onmousedown = function () {
     if (game.player.numOfMoves < limit && currentArea !== undefined){
-        drawAndFallChip(field, game.player.chip, currentArea, game.player.color);
+        drawAndFallChip(game.player.chip, currentArea, game.player.color);
     }
 }
 
@@ -217,7 +217,7 @@ canvas.ondblclick = function (e){
             clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
             game.player.numOfMoves--;
             field[pos.i][pos.j].busy = 0;
-            game.numArr[pos.i][pos.j].busy = 0;
+            game.nums[pos.i][pos.j] = 0;
         }
     }
 }
@@ -234,6 +234,10 @@ function Queue() {
     this._newestIndex = 1;
     this._storage = {};
 }
+
+Queue.prototype.size = function() {
+    return this._newestIndex - this._oldestIndex;
+};
 
 Queue.prototype.enqueue = function(data) {
     this._storage[this._newestIndex] = data;
@@ -259,45 +263,37 @@ class Player {
         this.name = name;
         this.chip = chip;
         this.color = color;
+        //Использую, но почему-то ругается
         this.lastPos = {i: -1, j: -1};
         this.numOfMoves = 0;
-        this.flag = false;
+        this.winFlag = false;
     }
-}
-
-function fromRectToNum(arr) {
-    let num = [];
-    for (let i = 0; i < row; i++){
-        num.push([]);
-        for(let j = 0; j < col; j++){
-            num[i].push(arr[i][j].busy);
-        }
-    }
-    return num;
 }
 
 class Game {
-    constructor(id, num) {
+    constructor(id, numArr) {
         this.id = id;
         this.playersQueue = new Queue();
-        //Правильно обработать или убрать
-        this.limit = 0;
         this.player = undefined;
         // Переделать чтобы он сначала заполнять num, а потом Rect
         //Поменять
-        this.numArr = num;
+        this.nums = numArr;
     }
 
     setupGame(){
         this.player = new Player("Иван", 1, playerColor1);
         this.playersQueue.enqueue(new Player("Денис", 2, playerColor2));
-        this.limit = limit;
+        this.playersQueue.enqueue(this.player);
     }
 
     changePlayers(){
-        // this.numArr= fromRectToNum(this.rectArr);
         // console.log(this.rectArr);
-        // console.log(this.numArr);
+        // console.log(this.nums);
+        if (this.checkWinner(this.nums, this.player.chip)){
+            this.player.winFlag = true;
+            this.block();
+            this.win();
+        }
 
         //Здесь отсылать на сервер, если нет ошибок,
         // продолжить смену игроков и игру,
@@ -307,13 +303,159 @@ class Game {
 
         this.player.numOfMoves = 0;
         this.player.lastPos = {i: -1, j: -1};
-        this.playersQueue.enqueue(this.player);
         this.player = this.playersQueue.dequeue();
-        // console.log(this.player);
+        this.playersQueue.enqueue(this.player);
+        console.log("change")
+        console.log(game.player)
+        console.log(game.playersQueue);
     }
 
-    checkWinner(){
+    block(){
+        for(let i = 0; i < row; i++){
+            for (let j = 0; j < col; j++){
+                if (field[i][j].busy === 0){
+                    field[i][j].busy = -1;
+                }
+            }
+        }
+    }
 
+
+    // Сделать более оптимизированную проверку диагоналей (в целом и так норм, можно и забить)
+    checkWinner(nums, chip){
+        let c = 0;
+        //Проход по массиву по горизонталям
+        for (let i = 0; i < row; i++) {
+            let j = 0;
+            while (j < col && col - j + c >= 4) {
+                if (chip === nums[i][j]){
+                    c++;
+                    if (c === 4){
+                        // console.log("Г")
+                        return true;
+                    }
+                }
+                else{
+                    c = 0;
+                }
+                // console.log(`i = ${i}, j = ${j}`)
+                // console.log(c);
+                j++;
+            }
+            j = 0;
+            c = 0;
+        }
+        //Проход по массиву по вертикали
+        for (let j = 0; j < col; j++) {
+            let i = row - 1;
+            while (i >= 0 && c + i + 1 >= 4) {
+                // console.log(`c = ${c}`);
+                if (chip === 0) {
+                    c = 0;
+                    break;
+                }
+                else if (chip === nums[i][j]){
+                    c++;
+                    // console.log(c);
+                    if (c === 4){
+                        c = 0;
+                        // console.log("В");
+                        return true;
+                    }
+                }
+                // console.log(`i = ${i}, j = ${j}`)
+                // console.log(c);
+
+                i--;
+                // console.log(i);
+            }
+            i = row - 1;
+            c = 0;
+        }
+
+        //Проход по массиву по диагонали от левого края
+        let j = 0;
+        let i = row / 2;
+        let k;
+        let m;
+        // console.log(col/2);
+        while(j < (col - 1) / 2){
+
+            if (i > 0){
+                i--;
+            }
+            else{
+                j++;
+            }
+            k = i;
+            m = j;
+            // console.log("\n")
+            while (k < row && m < col){
+                // console.log(`i = ${k}, j = ${m}`)
+                if (chip === nums[k][m]){
+                    c++;
+                    if (c === 4){
+                        // console.log("ПД");
+                        return true
+                    }
+                }
+                else{
+                    c = 0;
+                }
+                k++;
+                m++;
+            }
+            c = 0;
+        }
+
+        //Проход по массиву по диагонали от правого края
+        i = row / 2;
+        j = col - 1;
+        while(j > (col - 1) / 2 ){
+            if (i > 0){
+                i--;
+            }
+            else{
+                j--;
+            }
+            k = i;
+            m = j;
+            // console.log("\n")
+            while (k < row && m >= 0){
+                // console.log(`i = ${k}, j = ${m}`)
+                if (chip === nums[k][m]){
+                    c++;
+                    if (c === 4){
+                        // console.log("ОД");
+                        return true
+                    }
+                }
+                else{
+                    c = 0;
+                }
+                k++;
+                m--;
+            }
+            c = 0;
+        }
+
+
+
+
+        return false;
+    }
+
+    win(){
+        this.banner()
+    }
+
+    banner(){
+        if (game.player.winFlag){
+            alert(`Congratulations, ${game.player.name}, you are Winner`)
+        }
+        else {
+            alert(`Sorry, ${game.player.name}, but you lose`)
+        }
     }
 
 }
@@ -323,27 +465,39 @@ function clearCanvas(ctx, rect, num) {
         for (let j = 0; j < col; j++){
             if (num[i][j] !== 0) {
                 clearCircle(ctx,rect[i][j].x1 + radius, rect[i][j].y1 + radius, radius)
-                rect[i][j].busy = 0;
-                num[i][j].busy = 0;
             }
+            rect[i][j].busy = 0;
+            num[i][j].busy = 0;
         }
     }
+    let size = game.playersQueue.size();
+    let player;
+    for (let i = 0; i < size; i++) {
+        player = game.playersQueue.dequeue();
+        player.winFlag = false;
+        if (i + 1 === size) {
+            game.player = player;
+        }
+        game.playersQueue.enqueue(player);
+    }
+    console.log("clear")
+    console.log(game.player)
+    console.log(game.playersQueue);
+
 }
 
 function startGame() {
-    game = new Game(123, field);
+    game = new Game(123, numArr);
     game.setupGame();
 }
 
 function restartGame(){
-    clearCanvas(ctx, field, game.numArr);
-    startGame(game);
+    clearCanvas(ctx, field, game.nums);
 }
 
 let currentArea = undefined;
 let game;
-let num;
+let numArr;
 let field;
-[field, num] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
-
+[field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 startGame(game);

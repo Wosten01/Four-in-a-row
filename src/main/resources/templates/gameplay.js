@@ -2,15 +2,11 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 //Скорее всего бесполезен в моём случае, так что просто убрать
 // let ctx = canvas.getContext("2d",{ willReadFrequently: true });
-
-
 const canvasH = canvas.height
 const canvasW = canvas.width
-
 // Прописать зависимость от выбранного варианта
 const row = 6;
 const col = 7;
-
 const squareSide = canvasW / col;
 const radius = squareSide / 2.5;
 const squareSideHalf = squareSide / 2;
@@ -18,7 +14,6 @@ const diameter = 2 * radius;
 const leftRectIndent = squareSideHalf - radius;
 const rightRectIndent = leftRectIndent + diameter;
 const indent = (canvasH - row * squareSide) / 2;
-
 //Поменять
 let limit = 7;
 
@@ -148,7 +143,7 @@ function drawAndFallChip(arr, playerNum, area, color){
     currentArea = undefined;
     game.player.numOfMoves++;
     if (i !== n){
-        let pace = 100;
+        let pace = 150;
 
         setTimeout(() => {clearCircle(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
 
@@ -226,7 +221,6 @@ canvas.ondblclick = function (e){
         }
     }
 }
-
 //Кринж, но лучше чем ничего
 function clearSelection() {
     if(window.getSelection) {
@@ -336,7 +330,6 @@ function clearCanvas(ctx, rect, num) {
     }
 }
 
-
 function startGame() {
     game = new Game(123, field);
     game.setupGame();
@@ -354,4 +347,3 @@ let field;
 [field, num] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 
 startGame(game);
-

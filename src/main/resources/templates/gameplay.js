@@ -1,5 +1,8 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
+//Скорее всего бесполезен в моём случае, так что просто убрать
+// let ctx = canvas.getContext("2d",{ willReadFrequently: true });
+
 
 const canvasH = canvas.height
 const canvasW = canvas.width
@@ -14,19 +17,15 @@ const squareSideHalf = squareSide / 2;
 const diameter = 2 * radius;
 const leftRectIndent = squareSideHalf - radius;
 const rightRectIndent = leftRectIndent + diameter;
+const indent = (canvasH - row * squareSide) / 2;
 
 //Поменять
 let limit = 7;
-//
-const indent = (canvasH - row * squareSide) / 2;
 
 const playerColor1 = "rgba(245,245,245,1)";
 const playerColor2 = "rgb(249,205,205)";
 const fieldColor = "rgba(244,172,100,0.8)";
 let lineColor = "rgba(256,0,100,0.4)";
-
-let currentArea = false;
-
 //Разобраться как работает
 function clearCircle(ctx, x, y, radius) {
     ctx.save();
@@ -49,7 +48,6 @@ function drawCircle(x, y, squareSideHalf, squareSide, color){
     ctx.closePath();
     ctx.stroke();
 }
-
 // Сделать закругления у боковых элементов
 function drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor) {
     ctx.fillStyle = fieldColor;
@@ -61,6 +59,7 @@ function drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor) {
 function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor) {
 
     let arrayRect = [];
+    let num = [];
 
     ctx.lineWidth = 0.6;
     ctx.strokeStyle = lineColor;
@@ -70,64 +69,52 @@ function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineCol
 
     for(let i = 0; i < row; i++){
         arrayRect.push([]);
+        num.push([]);
         for (let j = 0; j < col; j++){
             drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor);
             arrayRect[i].push({x1: x + leftRectIndent,x2: x + rightRectIndent,
-                               y1: y + leftRectIndent, y2 : y + rightRectIndent, busy: 0})
+                               y1: y + leftRectIndent, y2 : y + rightRectIndent, busy : 0})
             x += squareSide;
+            num[i].push(0);
         }
         x = 0;
         y += squareSide;
     }
     // lineColor = curPlayer.color;
     ctx.strokeStyle = lineColor;
-    return arrayRect;
+    return [arrayRect, num];
 }
 
-// drawTable(ctx, radius, squareSide, squareSideHalf, playerColor1, playerColor2, fieldColor, lineColor);
-
-function between(elem, x, y) {
-    return elem.busy === 0 && elem.x1 < x && x < elem.x2 && elem.y1 < y && y < elem.y2;
-
+function inArea(elem, x, y) {
+    // console.log(elem);
+    return elem.x1 < x && x < elem.x2
+        && elem.y1 < y && y < elem.y2 ;
 }
 
-function betweenWithChip(elem, x, y, chip) {
-    return elem.busy === chip && elem.x1 < x && x < elem.x2
-           && elem.y1 < y && y < elem.y2 ;
+function inAreaAndEmpty(area, x, y) {
+    return area.busy === 0 && area.x1 < x && x < area.x2 && area.y1 < y && y < area.y2;
 }
-
-//Переписать с функцией в качестве аргумента
-
-function findArea(arrayRect, x, y){
+//Переписать без перебора всех значений
+function findArea(x, y){
     for(let i = 0; i < row; i++){
         for (let  j = 0; j < col; j++){
-            let elem = arrayRect[i][j];
-            if (between(elem, x, y)) {
-                return elem;
+            let area = field[i][j];
+            if (inAreaAndEmpty(area, x, y)) {
+                return area;
             }
         }
     }
-    return false;
+    return undefined;
 }
 
-function findAreaWithPlayersChip(arrayRect, x, y, chip, pos){
-    let elem = arrayRect[pos.i][pos.j];
-    if (betweenWithChip(elem, x, y, chip)){
-        return elem;
-    }
-    return false;
-}
-
-
-function runCircle(area, x, y) {
-    // Подумать как сделать что-бы при направлении на закрашенный участок не нужно было заново отрисовывать
-
-    if (between(area, x, y)){
+function changeCircle(draw, area) {
+    if (draw){
         drawCircle(area.x1, area.y1, radius, diameter, game.player.color);
+        // console.log("Рисую фишку")
     }
-    else {
-       clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
-       currentArea = false;
+    else{
+        clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
+        // console.log("Удаляю")
     }
 }
 
@@ -147,72 +134,95 @@ function drawAndFallChip(arr, playerNum, area, color){
     let n = pair.i;
     let m = pair.j;
     let i = n;
-    let pace = 150;
-    setTimeout(() => {clearCircle(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
+
     while (i < row - 1 && arr[i][m].busy === 0) {
         i++;
-
     }
     if (arr[i][m].busy !== 0){
         i--;
     }
 
-    game.rectArr[i][m].busy = playerNum;
+    field.busy = playerNum;
+    game.numArr[i][m].busy = playerNum;
     game.player.lastPos = {i: i, j: m};
-    currentArea = false;
+    currentArea = undefined;
+    game.player.numOfMoves++;
+    if (i !== n){
+        let pace = 100;
 
-    for (let k = n + 1; k < i; k++){
-        setTimeout(() => {drawCircle(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},  -100 + pace);
-        setTimeout(() => {clearCircle(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);}, 50 + pace);
-        pace += 150;
+        setTimeout(() => {clearCircle(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
+
+        for (let k = n + 1; k < i; k++){
+            if (field[k][m].busy === 0){
+                setTimeout(() => {drawCircle(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},  -100 + pace);
+                setTimeout(() => {clearCircle(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);}, 50 + pace);
+            }
+            pace += 100;
+        }
+
+        setTimeout(() => {drawCircle(arr[i][m].x1, arr[i][m].y1, radius, diameter, color);}, pace);
+
+        setTimeout(() => {
+            if (limit > 1){
+                //Возможно будет работать не на всех случаях, но пока работал на всех X)
+                let color = game.player.color.split(",");
+                color[0] = color[0].split("(")[1];
+                let pix;
+                for (let i = 0; i < row; i++){
+                    for (let j = 0; j < row; j++){
+                        if (field[i][j].busy === playerNum){
+                            pix = ctx.getImageData(field[i][j].x1 + radius, field[i][j].y1 + radius, 1, 1).data;
+                            if (pix[0] !== color[0]*1 && pix[1] !== color[1]*1 && pix[2] !== color[2]*1){
+                                drawCircle(arr[i][j].x1, arr[i][j].y1, radius, diameter, color);
+                            }
+
+                        }
+                    }
+                }
+            }
+        }, pace + 100);
     }
-    setTimeout(() => {drawCircle(arr[i][m].x1, arr[i][m].y1, radius, diameter, color);}, pace)
 }
 
 canvas.onmousemove = function (e) {
     let x = e.pageX - canvas.offsetLeft;
     let y = e.pageY - canvas.offsetTop;
 
-    if (currentArea === false){
-        currentArea = findArea(game.rectArr, x, y);
-        runCircle(currentArea, x, y);
+    if (currentArea === undefined) {
+        let newCurrArea = findArea(x, y);
+        if (newCurrArea !== undefined){
+            // Случай, когда нужно нарисовать фишку
+            changeCircle(true, newCurrArea, x, y);
+            currentArea = newCurrArea;
+        }
+    } else {
+        if (!inAreaAndEmpty(currentArea, x, y)){
+            changeCircle(false, currentArea);
+            currentArea = undefined;
+        }
     }
-    else {
-        runCircle(currentArea, x, y);
-    }
+    // console.log(currentArea);
 }
 
 canvas.onmousedown = function () {
-    if (game.player.numOfMoves < limit && currentArea !== false){
-        drawAndFallChip(game.rectArr, game.player.chip, currentArea, game.player.color);
-        game.player.numOfMoves++;
+    if (game.player.numOfMoves < limit && currentArea !== undefined){
+        drawAndFallChip(field, game.player.chip, currentArea, game.player.color);
     }
-    // нужно ли прописать при отсутствии зоны
 }
-    //Переписать чтобы он 2 раза одно и тоже не искал
+
 canvas.ondblclick = function (e){
     clearSelection();
     if (game.player.lastPos.i !== -1 && game.player.lastPos.j !== -1 ) {
-
         let x = e.pageX - canvas.offsetLeft;
         let y = e.pageY - canvas.offsetTop;
+        let pos = game.player.lastPos;
+        let area = field[pos.i][pos.j];
 
-        // console.log(game);
-
-        let area = findAreaWithPlayersChip(game.rectArr, x, y, game.player.chip, game.player.lastPos);
-
-        if (area !== false) {
-
-            let n = findInDoubleArr(game.rectArr, area);
+        if (inArea(area, x, y)){
             clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
-
-            if (game.rectArr[n.i][n.j].busy !== 0) {
-                game.player.numOfMoves--;
-            }
-            game.rectArr[n.i][n.j].busy = 0;
-            currentArea = area;
-
-            // console.log("chips= ", curChips);
+            game.player.numOfMoves--;
+            field[pos.i][pos.j].busy = 0;
+            game.numArr[pos.i][pos.j].busy = 0;
         }
     }
 }
@@ -273,16 +283,15 @@ function fromRectToNum(arr) {
 }
 
 class Game {
-    constructor(id, field) {
+    constructor(id, num) {
         this.id = id;
         this.playersQueue = new Queue();
         //Правильно обработать или убрать
         this.limit = 0;
         this.player = undefined;
         // Переделать чтобы он сначала заполнять num, а потом Rect
-        this.rectArr = field;
         //Поменять
-        this.numArr = fromRectToNum(field);
+        this.numArr = num;
     }
 
     setupGame(){
@@ -292,9 +301,9 @@ class Game {
     }
 
     changePlayers(){
-        this.numArr= fromRectToNum(this.rectArr);
-        console.log(this.rectArr);
-        console.log(this.numArr);
+        // this.numArr= fromRectToNum(this.rectArr);
+        // console.log(this.rectArr);
+        // console.log(this.numArr);
 
         //Здесь отсылать на сервер, если нет ошибок,
         // продолжить смену игроков и игру,
@@ -334,22 +343,15 @@ function startGame() {
 }
 
 function restartGame(){
-    clearCanvas(ctx, game.rectArr, game.numArr);
+    clearCanvas(ctx, field, game.numArr);
     startGame(game);
 }
 
+let currentArea = undefined;
 let game;
+let num;
 let field;
-field = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
-// startGame(game);
+[field, num] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
+
 startGame(game);
-// game = new Game(123);
-// game.setupGame()
-// console.log(game);
-//Переписать чтобы была видна game в canvas и чтобы её не приходилось перерисовывать
-
-
-//Обработать так, чтобы при падении фишки не потерять фишку,
-// которую можно поставить ниже, правда имеет смысл только при
-// добавлении нескольких фишек за раз
 

@@ -50,3 +50,26 @@
     font-size: 0.9em;
 
 }
+
+#SubmitButton{
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 30px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+
+    /*padding-right: 100px;*/
+    /*margin: auto auto;*/
+    margin: 0 auto;
+}
+
+/*#SubmitButton:hover{*/
+/*    background-color: #347634;*/
+/*}*/
+
+#SubmitButton:active{
+    background-color: #347634;
+}

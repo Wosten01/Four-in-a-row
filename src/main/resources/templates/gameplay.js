@@ -15,7 +15,7 @@ const leftRectIndent = squareSideHalf - radius;
 const rightRectIndent = leftRectIndent + diameter;
 const indent = (canvasH - row * squareSide) / 2;
 //Поменять
-let limit = 7;
+let limit = 4;
 
 const playerColor1 = "rgba(245,245,245,1)";
 const playerColor2 = "rgba(249,205,205,1)";
@@ -275,9 +275,8 @@ class Game {
         this.id = id;
         this.playersQueue = new Queue();
         this.player = undefined;
-        // Переделать чтобы он сначала заполнять num, а потом Rect
-        //Поменять
         this.nums = numArr;
+        this.hasWinner = false;
     }
 
     setupGame(){
@@ -287,13 +286,25 @@ class Game {
     }
 
     changePlayers(){
-        // console.log(this.rectArr);
-        // console.log(this.nums);
-        if (this.checkWinner(this.nums, this.player.chip)){
+        console.log("change");
+        if (this.hasWinner){
+            this.win();
+        }
+        else if (this.checkWinner(this.nums, this.player.chip)){
+            this.hasWinner = true;
             this.player.winFlag = true;
+            this.player.lastPos = {i: -1, j: -1};
             this.block();
             this.win();
         }
+        else {
+            this.player.numOfMoves = 0;
+            this.player.lastPos = {i: -1, j: -1};
+            this.player = this.playersQueue.dequeue();
+            this.playersQueue.enqueue(this.player);
+        }
+        // console.log(game.playersQueue);
+        // this.playersQueue.enqueue(this.player);
 
         //Здесь отсылать на сервер, если нет ошибок,
         // продолжить смену игроков и игру,
@@ -301,13 +312,10 @@ class Game {
         // убрать поле и предложить сыграть снова
         // this.num = returned num;
 
-        this.player.numOfMoves = 0;
-        this.player.lastPos = {i: -1, j: -1};
-        this.player = this.playersQueue.dequeue();
-        this.playersQueue.enqueue(this.player);
-        console.log("change")
-        console.log(game.player)
-        console.log(game.playersQueue);
+        //
+        // console.log("change")
+        // console.log(game.player)
+        // console.log(game.playersQueue);
     }
 
     block(){
@@ -320,7 +328,6 @@ class Game {
         }
     }
 
-
     // Сделать более оптимизированную проверку диагоналей (в целом и так норм, можно и забить)
     checkWinner(nums, chip){
         let c = 0;
@@ -331,7 +338,7 @@ class Game {
                 if (chip === nums[i][j]){
                     c++;
                     if (c === 4){
-                        // console.log("Г")
+                        console.log("Г")
                         return true;
                     }
                 }
@@ -359,7 +366,7 @@ class Game {
                     // console.log(c);
                     if (c === 4){
                         c = 0;
-                        // console.log("В");
+                        console.log("В");
                         return true;
                     }
                 }
@@ -378,6 +385,7 @@ class Game {
         let i = row / 2;
         let k;
         let m;
+        c = 0;
         // console.log(col/2);
         while(j < (col - 1) / 2){
 
@@ -391,11 +399,13 @@ class Game {
             m = j;
             // console.log("\n")
             while (k < row && m < col){
-                // console.log(`i = ${k}, j = ${m}`)
                 if (chip === nums[k][m]){
                     c++;
+                    console.log(`i = ${k}, j = ${m}`)
                     if (c === 4){
-                        // console.log("ПД");
+                        console.log("ПД");
+                        console.log(nums);
+
                         return true
                     }
                 }
@@ -426,7 +436,7 @@ class Game {
                 if (chip === nums[k][m]){
                     c++;
                     if (c === 4){
-                        // console.log("ОД");
+                        console.log("ОД");
                         return true
                     }
                 }
@@ -438,10 +448,6 @@ class Game {
             }
             c = 0;
         }
-
-
-
-
         return false;
     }
 
@@ -461,27 +467,36 @@ class Game {
 }
 
 function clearCanvas(ctx, rect, num) {
+    game.hasWinner = false;
+    // console.log(game.playersQueue);
+    // console.log(game.nums);
     for (let i = 0; i < row; i++){
         for (let j = 0; j < col; j++){
-            if (num[i][j] !== 0) {
+            if (num[i][j] !== 0 && num[i][j] !== -1) {
                 clearCircle(ctx,rect[i][j].x1 + radius, rect[i][j].y1 + radius, radius)
             }
             rect[i][j].busy = 0;
-            num[i][j].busy = 0;
+            num[i][j] = 0;
         }
     }
+    // console.log("Field and nums after delete");
+    // console.log(game.nums);
+    // console.log(field);
+    console.log(game.playersQueue);
     let size = game.playersQueue.size();
     let player;
     for (let i = 0; i < size; i++) {
         player = game.playersQueue.dequeue();
         player.winFlag = false;
+        player.lastPos = {i: -1, j: -1};
+        player.numOfMoves = 0;
         if (i + 1 === size) {
             game.player = player;
         }
         game.playersQueue.enqueue(player);
     }
-    console.log("clear")
-    console.log(game.player)
+    // console.log("clear")
+    // console.log(game.player)
     console.log(game.playersQueue);
 
 }
@@ -499,5 +514,6 @@ let currentArea = undefined;
 let game;
 let numArr;
 let field;
+// let WinnerFlag = false;
 [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 startGame(game);

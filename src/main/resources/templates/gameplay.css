@@ -39,7 +39,7 @@
 }
 
 #gamePanel canvas{
-    border:1px solid #000000;
+    /*border:1px solid #000000;*/
     text-align: center;
     /*width="200";*/
     /*height="100";*/
@@ -71,5 +71,25 @@
 /*}*/
 
 #SubmitButton:active{
-    background-color: #347634;
+    background-color: #46a346;
+}
+
+
+#RestartButton{
+    background-color: #e03348; /* Алый */
+    border: none;
+    color: white;
+    padding: 30px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+
+    /*padding-right: 100px;*/
+    /*margin: auto auto;*/
+    margin: -150px 130px;
+}
+
+#RestartButton:active{
+    background-color: #cb2d3e;
 }

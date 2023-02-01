@@ -1,33 +1,42 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                             ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ И КОНСТАНТ                                           */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-//Скорее всего бесполезен в моём случае, так что просто убрать
-// let ctx = canvas.getContext("2d",{ willReadFrequently: true });
 const canvasH = canvas.height
 const canvasW = canvas.width
 // Прописать зависимость от выбранного варианта
 const row = 6;
 const col = 7;
-const squareSide = canvasW / col;
-const radius = squareSide / 2.5;
+const indentX = 5;
+const squareSide = (canvasW - 2 * indentX) / col;
+const radius = squareSide / 2.65;
 const squareSideHalf = squareSide / 2;
 const diameter = 2 * radius;
 const leftRectIndent = squareSideHalf - radius;
 const rightRectIndent = leftRectIndent + diameter;
-const indent = (canvasH - row * squareSide) / 2;
+
+const indentY = (canvasH - row * squareSide) / 2;
+const edge = radius * 0.7;
 //Поменять
-let limit = 4;
+let limit = 1;
 
 const playerColor1 = "rgba(245,245,245,1)";
 const playerColor2 = "rgba(249,205,205,1)";
 const fieldColor = "rgba(244,172,100,0.8)";
-let lineColor = "rgba(256,0,100,0.4)";
-//Разобраться как работает
+let lineColor = "rgba(205,3,43,0.7)";
+let lineColor1 = "rgba(256,0,100,0.4)";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                             ФУНКЦИИ ЗАПОЛНЕНИЯ ПОЛЯ                                                                */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function clearCircle(ctx, x, y, radius) {
     ctx.save();
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2*Math.PI, true);
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
     ctx.clip();
-    ctx.clearRect(x-radius,y-radius,radius*2,radius*2);
+    ctx.clearRect(x-radius,y-radius, diameter, diameter);
     ctx.restore();
 }
 
@@ -43,12 +52,82 @@ function drawCircle(x, y, squareSideHalf, squareSide, color){
     ctx.closePath();
     ctx.stroke();
 }
-// Сделать закругления у боковых элементов
-function drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor) {
+
+function drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor, i, j) {
     ctx.fillStyle = fieldColor;
-    ctx.fillRect(x, y, squareSide, squareSide);
-    ctx.strokeRect(x, y, squareSide, squareSide);
+    ctx.lineWidth = 1.7;
+    if (i === 0 && j === 0)
+        fillRoundedRect00(ctx, x, y, squareSide, squareSide, edge);
+    else if (i === 0 && j === 6)
+        fillRoundedRect06(ctx, x, y, squareSide, squareSide, edge);
+    else if (i === 5 && j === 6)
+        fillRoundedRect56(ctx, x, y, squareSide, squareSide, edge);
+    else if (i === 5 && j === 0)
+        fillRoundedRect50(ctx, x, y, squareSide, squareSide, edge);
+    else {
+        ctx.lineWidth = 1.3;
+        ctx.fillRect(x, y, squareSide, squareSide);
+        ctx.strokeRect(x, y, squareSide, squareSide);
+    }
+    ctx.lineWidth = 0.001;
     clearCircle(ctx, x + squareSideHalf, y + squareSideHalf, radius);
+}
+
+function fillRoundedRect06(ctx, x, y, w, h, r){
+    let halfW = w / 2;
+    let halfH = w / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + halfW, y);
+    ctx.arcTo(x + w, y, x + w, y + halfH, r);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x, y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+}
+
+function fillRoundedRect00(ctx, x, y, w, h, r){
+    let halfW = w / 2;
+    let halfH = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + halfW, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x, y + halfH);
+    ctx.arcTo(x, y, x + halfW, y, r);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+}
+
+function fillRoundedRect56(ctx, x, y, w, h, r){
+    let halfW = w / 2;
+    let halfH = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + halfW);
+    ctx.arcTo(x + w, y + h, x + halfW, y + h, r);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+}
+
+function fillRoundedRect50(ctx, x, y, w, h, r){
+    let halfW = w / 2;
+    let halfH = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x + halfW, y + h);
+    ctx.arcTo(x, y + h, x, y + halfH, r);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
 }
 
 function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor) {
@@ -56,29 +135,35 @@ function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineCol
     let arrayRect = [];
     let num = [];
 
-    ctx.lineWidth = 0.6;
+
+    // ctx.lineWidth = 0.6;
+    // ctx.lineWidth = 1.3;
     ctx.strokeStyle = lineColor;
 
-    let x = 0;
-    let y = indent;
+    let x = indentX;
+    let y = indentY;
 
     for(let i = 0; i < row; i++){
         arrayRect.push([]);
         num.push([]);
         for (let j = 0; j < col; j++){
-            drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor);
+            drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor, i, j);
             arrayRect[i].push({x1: x + leftRectIndent,x2: x + rightRectIndent,
                                y1: y + leftRectIndent, y2 : y + rightRectIndent, busy : 0})
             x += squareSide;
             num[i].push(0);
         }
-        x = 0;
+        x = indentX;
         y += squareSide;
     }
     // lineColor = curPlayer.color;
     ctx.strokeStyle = lineColor;
     return [arrayRect, num];
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                             ФУНКЦИИ ОБРАБОТКИ ПОВЕДЕНИЯ И КООРДИНАТ ФИШЕК                                          */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function inArea(elem, x, y) {
     // console.log(elem);
@@ -229,60 +314,54 @@ function clearSelection() {
     }
 }
 
-function Queue() {
-    this._oldestIndex = 1;
-    this._newestIndex = 1;
-    this._storage = {};
-}
-
-Queue.prototype.size = function() {
-    return this._newestIndex - this._oldestIndex;
-};
-
-Queue.prototype.enqueue = function(data) {
-    this._storage[this._newestIndex] = data;
-    this._newestIndex++;
-};
-
-Queue.prototype.dequeue = function() {
-    let oldestIndex = this._oldestIndex,
-        newestIndex = this._newestIndex,
-        deletedData;
-
-    if (oldestIndex !== newestIndex) {
-        deletedData = this._storage[oldestIndex];
-        delete this._storage[oldestIndex];
-        this._oldestIndex++;
-
-        return deletedData;
-    }
-};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                             ОПИСАНИЕ ИГРОВЫХ МЕХАНИК                                                               */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Player {
     constructor(name, chip, color) {
         this.name = name;
         this.chip = chip;
-        this.color = color;
+        this.winFlag = false;
+        this.winRating = 0;
         //Использую, но почему-то ругается
         this.lastPos = {i: -1, j: -1};
         this.numOfMoves = 0;
-        this.winFlag = false;
+        this.color = color;
     }
 }
 
 class Game {
     constructor(id, numArr) {
         this.id = id;
-        this.playersQueue = new Queue();
+        this.playersList = [];
         this.player = undefined;
+        this.playerNum = undefined;
         this.nums = numArr;
         this.hasWinner = false;
     }
 
+    getPlayerNum(){
+        this.playerNum = this.player.chip - 1;
+    }
+
+    getNextPlayerNum(){
+        this.playerNum = (this.playerNum + 1 < this.playersList.length) ? ++this.playerNum : 0;
+        return this.playerNum;
+    }
+
     setupGame(){
         this.player = new Player("Иван", 1, playerColor1);
-        this.playersQueue.enqueue(new Player("Денис", 2, playerColor2));
-        this.playersQueue.enqueue(this.player);
+        //
+        this.getPlayerNum();
+        this.playersList.push(this.player);
+        this.playersList.push(new Player("Денис", 2, playerColor2));
+        // console.log(game.playersList);
+        // console.log(game.player);
+        // this.player.winFlag = true;
+        // console.log("after")
+        // console.log(game.playersList);
+        console.log(game);
     }
 
     changePlayers(){
@@ -294,16 +373,21 @@ class Game {
             this.hasWinner = true;
             this.player.winFlag = true;
             this.player.lastPos = {i: -1, j: -1};
+            this.player.winRating += 1;
             this.block();
             this.win();
         }
         else {
             this.player.numOfMoves = 0;
             this.player.lastPos = {i: -1, j: -1};
-            this.player = this.playersQueue.dequeue();
-            this.playersQueue.enqueue(this.player);
+            // let k = this.getPlayerNum();
+            // console.log(`k = ${k}`);
+            //Возможно как-то более логично сделать, чтобы не пересчитывать каждый раз размер массива
+            // console.log(`this.playerNum = ${this.playerNum}`);
+            this.player = this.playersList[this.getNextPlayerNum()];
+            // this.playersQueue.enqueue(this.player);
         }
-        // console.log(game.playersQueue);
+        console.log(game);
         // this.playersQueue.enqueue(this.player);
 
         //Здесь отсылать на сервер, если нет ошибок,
@@ -329,6 +413,7 @@ class Game {
     }
 
     // Сделать более оптимизированную проверку диагоналей (в целом и так норм, можно и забить)
+    //Обработать ничью
     checkWinner(nums, chip){
         let c = 0;
         //Проход по массиву по горизонталям
@@ -482,22 +567,24 @@ function clearCanvas(ctx, rect, num) {
     // console.log("Field and nums after delete");
     // console.log(game.nums);
     // console.log(field);
-    console.log(game.playersQueue);
-    let size = game.playersQueue.size();
+    console.log(game.playersList);
+    // let size = game.playersQueue.size();
+    // let player;
     let player;
-    for (let i = 0; i < size; i++) {
-        player = game.playersQueue.dequeue();
+    for (let i = 0; i < game.playersList.length; i++) {
+        player = game.playersList[i];
+        if (!player.winFlag) {
+            game.player = player;
+            //Я думаю это стоит переписать
+            game.getPlayerNum();
+        }
         player.winFlag = false;
         player.lastPos = {i: -1, j: -1};
         player.numOfMoves = 0;
-        if (i + 1 === size) {
-            game.player = player;
-        }
-        game.playersQueue.enqueue(player);
     }
     // console.log("clear")
     // console.log(game.player)
-    console.log(game.playersQueue);
+    console.log(game.playersList);
 
 }
 
@@ -514,6 +601,5 @@ let currentArea = undefined;
 let game;
 let numArr;
 let field;
-// let WinnerFlag = false;
 [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 startGame(game);

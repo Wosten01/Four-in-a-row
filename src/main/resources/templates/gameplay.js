@@ -18,7 +18,7 @@ const rightRectIndent = leftRectIndent + diameter;
 
 const indentY = (canvasH - row * squareSide) / 2;
 const edge = radius * 0.7;
-//Поменять
+// Поменять
 let limit = 1;
 
 const playerColor1 = "rgba(245,245,245,1)";
@@ -31,7 +31,7 @@ let lineColor1 = "rgba(256,0,100,0.4)";
 /*                             ФУНКЦИИ ЗАПОЛНЕНИЯ ПОЛЯ                                                                */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function clearCircle(ctx, x, y, radius) {
+function clearChip(ctx, x, y, radius) {
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
@@ -40,7 +40,7 @@ function clearCircle(ctx, x, y, radius) {
     ctx.restore();
 }
 
-function drawCircle(x, y, squareSideHalf, squareSide, color){
+function drawChip(x, y, squareSideHalf, squareSide, color){
     //Возможно имеет смысл поменять
     ctx.strokeStyle = color;
     ctx.beginPath();
@@ -70,7 +70,7 @@ function drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor, i, j) {
         ctx.strokeRect(x, y, squareSide, squareSide);
     }
     ctx.lineWidth = 0.001;
-    clearCircle(ctx, x + squareSideHalf, y + squareSideHalf, radius);
+    clearChip(ctx, x + squareSideHalf, y + squareSideHalf, radius);
 }
 
 function fillRoundedRect06(ctx, x, y, w, h, r){
@@ -187,14 +187,12 @@ function findArea(x, y){
     return undefined;
 }
 
-function changeCircle(draw, area) {
+function drawOrClearChip(draw, area) {
     if (draw){
-        drawCircle(area.x1, area.y1, radius, diameter, game.player.color);
-        // console.log("Рисую фишку")
+        drawChip(area.x1, area.y1, radius, diameter, game.player.color);
     }
     else{
-        clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
-        // console.log("Удаляю")
+        clearChip(ctx, area.x1 + radius, area.y1 + radius, radius);
     }
 }
 
@@ -231,17 +229,17 @@ function drawAndFallChip(chip, area, color){
     if (i !== n){
         let pace = 150;
 
-        setTimeout(() => {clearCircle(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
+        setTimeout(() => {clearChip(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
 
         for (let k = n + 1; k < i; k++){
             if (field[k][m].busy === 0){
-                setTimeout(() => {drawCircle(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},  -100 + pace);
-                setTimeout(() => {clearCircle(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);}, 50 + pace);
+                setTimeout(() => {drawChip(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},  -100 + pace);
+                setTimeout(() => {clearChip(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);}, 50 + pace);
             }
             pace += 100;
         }
 
-        setTimeout(() => {drawCircle(arr[i][m].x1, arr[i][m].y1, radius, diameter, color);}, pace);
+        setTimeout(() => {drawChip(arr[i][m].x1, arr[i][m].y1, radius, diameter, color);}, pace);
 
         setTimeout(() => {
             if (limit > 1){
@@ -254,7 +252,7 @@ function drawAndFallChip(chip, area, color){
                         if (field[i][j].busy === chip){
                             pix = ctx.getImageData(field[i][j].x1 + radius, field[i][j].y1 + radius, 1, 1).data;
                             if (pix[0] !== color[0]*1 && pix[1] !== color[1]*1 && pix[2] !== color[2]*1){
-                                drawCircle(arr[i][j].x1, arr[i][j].y1, radius, diameter, color);
+                                drawChip(arr[i][j].x1, arr[i][j].y1, radius, diameter, color);
                             }
 
                         }
@@ -273,12 +271,12 @@ canvas.onmousemove = function (e) {
         let newCurrArea = findArea(x, y);
         if (newCurrArea !== undefined){
             // Случай, когда нужно нарисовать фишку
-            changeCircle(true, newCurrArea, x, y);
+            drawOrClearChip(true, newCurrArea, x, y);
             currentArea = newCurrArea;
         }
     } else {
         if (!inAreaAndEmpty(currentArea, x, y)){
-            changeCircle(false, currentArea);
+            drawOrClearChip(false, currentArea);
             currentArea = undefined;
         }
     }
@@ -299,7 +297,7 @@ canvas.ondblclick = function (e){
         let area = field[pos.i][pos.j];
 
         if (inArea(area, x, y)){
-            clearCircle(ctx, area.x1 + radius, area.y1 + radius, radius);
+            clearChip(ctx, area.x1 + radius, area.y1 + radius, radius);
             game.player.numOfMoves--;
             field[pos.i][pos.j].busy = 0;
             game.nums[pos.i][pos.j] = 0;
@@ -352,15 +350,9 @@ class Game {
 
     setupGame(){
         this.player = new Player("Иван", 1, playerColor1);
-        //
         this.getPlayerNum();
         this.playersList.push(this.player);
         this.playersList.push(new Player("Денис", 2, playerColor2));
-        // console.log(game.playersList);
-        // console.log(game.player);
-        // this.player.winFlag = true;
-        // console.log("after")
-        // console.log(game.playersList);
         console.log(game);
     }
 
@@ -380,26 +372,15 @@ class Game {
         else {
             this.player.numOfMoves = 0;
             this.player.lastPos = {i: -1, j: -1};
-            // let k = this.getPlayerNum();
-            // console.log(`k = ${k}`);
-            //Возможно как-то более логично сделать, чтобы не пересчитывать каждый раз размер массива
-            // console.log(`this.playerNum = ${this.playerNum}`);
             this.player = this.playersList[this.getNextPlayerNum()];
-            // this.playersQueue.enqueue(this.player);
         }
-        console.log(game);
-        // this.playersQueue.enqueue(this.player);
+        // console.log(game);
 
         //Здесь отсылать на сервер, если нет ошибок,
         // продолжить смену игроков и игру,
         // иначе вывести баннер победителя, засчитать очко
         // убрать поле и предложить сыграть снова
         // this.num = returned num;
-
-        //
-        // console.log("change")
-        // console.log(game.player)
-        // console.log(game.playersQueue);
     }
 
     block(){
@@ -423,15 +404,13 @@ class Game {
                 if (chip === nums[i][j]){
                     c++;
                     if (c === 4){
-                        console.log("Г")
+                        // console.log("Г")
                         return true;
                     }
                 }
                 else{
                     c = 0;
                 }
-                // console.log(`i = ${i}, j = ${j}`)
-                // console.log(c);
                 j++;
             }
             j = 0;
@@ -441,25 +420,19 @@ class Game {
         for (let j = 0; j < col; j++) {
             let i = row - 1;
             while (i >= 0 && c + i + 1 >= 4) {
-                // console.log(`c = ${c}`);
                 if (chip === 0) {
                     c = 0;
                     break;
                 }
                 else if (chip === nums[i][j]){
                     c++;
-                    // console.log(c);
                     if (c === 4){
                         c = 0;
-                        console.log("В");
+                        // console.log("В");
                         return true;
                     }
                 }
-                // console.log(`i = ${i}, j = ${j}`)
-                // console.log(c);
-
                 i--;
-                // console.log(i);
             }
             i = row - 1;
             c = 0;
@@ -471,7 +444,6 @@ class Game {
         let k;
         let m;
         c = 0;
-        // console.log(col/2);
         while(j < (col - 1) / 2){
 
             if (i > 0){
@@ -482,15 +454,11 @@ class Game {
             }
             k = i;
             m = j;
-            // console.log("\n")
             while (k < row && m < col){
                 if (chip === nums[k][m]){
                     c++;
-                    console.log(`i = ${k}, j = ${m}`)
                     if (c === 4){
-                        console.log("ПД");
-                        console.log(nums);
-
+                        // console.log("ПД");
                         return true
                     }
                 }
@@ -515,13 +483,11 @@ class Game {
             }
             k = i;
             m = j;
-            // console.log("\n")
             while (k < row && m >= 0){
-                // console.log(`i = ${k}, j = ${m}`)
                 if (chip === nums[k][m]){
                     c++;
                     if (c === 4){
-                        console.log("ОД");
+                        // console.log("ОД");
                         return true
                     }
                 }
@@ -535,7 +501,8 @@ class Game {
         }
         return false;
     }
-
+    //Переработать функцию, скорее всего нужно будет это сделать
+    // уже после подключения к spring boot
     win(){
         this.banner()
     }
@@ -548,28 +515,19 @@ class Game {
             alert(`Sorry, ${game.player.name}, but you lose`)
         }
     }
-
 }
 
 function clearCanvas(ctx, rect, num) {
     game.hasWinner = false;
-    // console.log(game.playersQueue);
-    // console.log(game.nums);
     for (let i = 0; i < row; i++){
         for (let j = 0; j < col; j++){
             if (num[i][j] !== 0 && num[i][j] !== -1) {
-                clearCircle(ctx,rect[i][j].x1 + radius, rect[i][j].y1 + radius, radius)
+                clearChip(ctx,rect[i][j].x1 + radius, rect[i][j].y1 + radius, radius)
             }
             rect[i][j].busy = 0;
             num[i][j] = 0;
         }
     }
-    // console.log("Field and nums after delete");
-    // console.log(game.nums);
-    // console.log(field);
-    console.log(game.playersList);
-    // let size = game.playersQueue.size();
-    // let player;
     let player;
     for (let i = 0; i < game.playersList.length; i++) {
         player = game.playersList[i];
@@ -582,9 +540,6 @@ function clearCanvas(ctx, rect, num) {
         player.lastPos = {i: -1, j: -1};
         player.numOfMoves = 0;
     }
-    // console.log("clear")
-    // console.log(game.player)
-    console.log(game.playersList);
 
 }
 

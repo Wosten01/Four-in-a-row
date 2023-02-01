@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                             ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ И КОНСТАНТ                                           */
+/*                                ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ И КОНСТАНТ                                        */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
@@ -19,7 +19,7 @@ const rightRectIndent = leftRectIndent + diameter;
 const indentY = (canvasH - row * squareSide) / 2;
 const edge = radius * 0.7;
 // Поменять
-let limit = 1;
+let limit = 7;
 
 const playerColor1 = "rgba(245,245,245,1)";
 const playerColor2 = "rgba(249,205,205,1)";
@@ -28,7 +28,7 @@ let lineColor = "rgba(205,3,43,0.7)";
 let lineColor1 = "rgba(256,0,100,0.4)";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                             ФУНКЦИИ ЗАПОЛНЕНИЯ ПОЛЯ                                                                */
+/*                                             ФУНКЦИИ ЗАПОЛНЕНИЯ ПОЛЯ                                                */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function clearChip(ctx, x, y, radius) {
@@ -135,9 +135,6 @@ function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineCol
     let arrayRect = [];
     let num = [];
 
-
-    // ctx.lineWidth = 0.6;
-    // ctx.lineWidth = 1.3;
     ctx.strokeStyle = lineColor;
 
     let x = indentX;
@@ -156,31 +153,46 @@ function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineCol
         x = indentX;
         y += squareSide;
     }
-    // lineColor = curPlayer.color;
     ctx.strokeStyle = lineColor;
     return [arrayRect, num];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                             ФУНКЦИИ ОБРАБОТКИ ПОВЕДЕНИЯ И КООРДИНАТ ФИШЕК                                          */
+/*                                    ФУНКЦИИ ОБРАБОТКИ ПОВЕДЕНИЯ И КООРДИНАТ ФИШЕК                                   */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function inArea(elem, x, y) {
-    // console.log(elem);
-    return elem.x1 < x && x < elem.x2
-        && elem.y1 < y && y < elem.y2 ;
+function inArea(area, x, y) {
+    return area.x1 <= x && x <= area.x2
+        && area.y1 <= y && y <= area.y2;
 }
 
 function inAreaAndEmpty(area, x, y) {
-    return area.busy === 0 && area.x1 < x && x < area.x2 && area.y1 < y && y < area.y2;
+    return area.busy === 0 && area.x1 <= x && x <= area.x2
+        && area.y1 <= y && y < area.y2;
 }
 //Переписать без перебора всех значений
 function findArea(x, y){
-    for(let i = 0; i < row; i++){
-        for (let  j = 0; j < col; j++){
-            let area = field[i][j];
-            if (inAreaAndEmpty(area, x, y)) {
-                return area;
+    let i = 0;
+    let j = 0;
+    let area;
+    while(i < row && j < col){
+        area = field[i][j];
+        if (x < area.x1 || y < area.y1) {
+            break;
+        }
+        else{
+            if (inArea(area, x, y)) {
+                if (area.busy === 0){
+                    return area;
+                }
+                else
+                    return undefined;
+            }
+            else {
+                if (x > area.x2)
+                    j++;
+                if (y > area.y2)
+                    i++;
             }
         }
     }
@@ -196,13 +208,17 @@ function drawOrClearChip(draw, area) {
     }
 }
 
-function findInDoubleArr(arr, el) {
-    for (let i = 0; i < row; i++){
-        for(let j = 0; j < col; j++){
-            if (arr[i][j] === el){
-                return {i: i, j: j} ;
-            }
-        }
+function findInDoubleArr(arr, area) {
+    let i = 0;
+    let j = 0;
+    while (i < row && j < col){
+        if (arr[i][j].y1 === area.y1)
+            if (arr[i][j].x1 === area.x1)
+                return {i : i, j : j};
+            else
+                j++;
+        else
+            i++;
     }
     return null;
 }
@@ -220,7 +236,6 @@ function drawAndFallChip(chip, area, color){
     if (arr[i][m].busy !== 0){
         i--;
     }
-
     field[i][m].busy = chip;
     game.nums[i][m] = chip;
     game.player.lastPos = {i: i, j: m};
@@ -233,8 +248,10 @@ function drawAndFallChip(chip, area, color){
 
         for (let k = n + 1; k < i; k++){
             if (field[k][m].busy === 0){
-                setTimeout(() => {drawChip(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},  -100 + pace);
-                setTimeout(() => {clearChip(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);}, 50 + pace);
+                setTimeout(() => {drawChip(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},
+                                  -100 + pace);
+                setTimeout(() => {clearChip(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);},
+                                  50 + pace);
             }
             pace += 100;
         }
@@ -250,11 +267,13 @@ function drawAndFallChip(chip, area, color){
                 for (let i = 0; i < row; i++){
                     for (let j = 0; j < row; j++){
                         if (field[i][j].busy === chip){
-                            pix = ctx.getImageData(field[i][j].x1 + radius, field[i][j].y1 + radius, 1, 1).data;
+                            pix = ctx.getImageData(field[i][j].x1 + radius,
+                                                   field[i][j].y1 + radius,
+                                                   1,
+                                                   1).data;
                             if (pix[0] !== color[0]*1 && pix[1] !== color[1]*1 && pix[2] !== color[2]*1){
                                 drawChip(arr[i][j].x1, arr[i][j].y1, radius, diameter, color);
                             }
-
                         }
                     }
                 }
@@ -313,7 +332,7 @@ function clearSelection() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                             ОПИСАНИЕ ИГРОВЫХ МЕХАНИК                                                               */
+/*                                           ОПИСАНИЕ ИГРОВЫХ МЕХАНИК                                                 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Player {
@@ -550,6 +569,7 @@ function startGame() {
 
 function restartGame(){
     clearCanvas(ctx, field, game.nums);
+    console.log(game);
 }
 
 let currentArea = undefined;
@@ -558,3 +578,7 @@ let numArr;
 let field;
 [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 startGame(game);
+console.log(field);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                                                  КОНЕЦ ФАЙЛА                                                       */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

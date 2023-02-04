@@ -47,23 +47,28 @@
 
 #infoPanel{
     text-align: center;
+    /*font-size: 1cm;*/
+    /*font-size: 0.9%;*/
     font-size: 0.9em;
 
 }
 
 #SubmitButton{
-    background-color: #4CAF50; /* Green */
+    background-color: #21b567; /* Green */
     border: none;
     color: white;
-    padding: 30px 30px;
     text-align: center;
     text-decoration: none;
+    font-size: 2em;
+    /*display: block;*/
     display: inline-block;
-    font-size: 20px;
-
-    /*padding-right: 100px;*/
-    /*margin: auto auto;*/
-    margin: 0 auto;
+    margin: 0.5em auto;
+    width: 5em;
+    height: 2em;
+    box-sizing: border-box;
+    border-radius: 0.3em;
+    /*border-style:  groove;*/
+    /*border-color: #21b567;*/
 }
 
 /*#SubmitButton:hover{*/
@@ -71,25 +76,51 @@
 /*}*/
 
 #SubmitButton:active{
-    background-color: #46a346;
+    background-color: #1eac59;
+    /*border-style: ridge;*/
+    /*border-color: palegreen;*/
 }
 
 
 #RestartButton{
-    background-color: #e03348; /* Алый */
+    /*background-color: #e03348; !* Алый *!*/
+    background-color: Tomato;
     border: none;
     color: white;
-    padding: 30px 30px;
     text-align: center;
     text-decoration: none;
+    /*visibility: hidden;*/
+    visibility: visible;
+    font-size: 2em;
+    /*display: block;*/
     display: inline-block;
-    font-size: 20px;
+    margin: 0.5em auto;
+    width: 5em;
+    height: 2em;
+    box-sizing: border-box;
+    border-radius: 0.3em;
 
+    /*transition: opacity 0.7s linear 2s;*/
     /*padding-right: 100px;*/
     /*margin: auto auto;*/
-    margin: -150px 130px;
+    /*margin: -150px 130px;*/
 }
 
 #RestartButton:active{
-    background-color: #cb2d3e;
+    background-color: #d15945;
+    /*background-color: #cb2d3e;*/
+}
+
+/*Разузнать побольше об этом параметре*/
+/*visibility: collapse;*/
+
+/*Можно использовать для плавного появления*/
+/*transition*/
+/*opacity*/
+
+#canvas {
+    /*height: 50em;*/
+    /*width: 50em;*/
+
+    /*background-color: #cb2d3e;*/
 }

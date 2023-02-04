@@ -21,11 +21,16 @@ const edge = radius * 0.7;
 // Поменять
 let limit = 7;
 
-const playerColor1 = "rgba(245,245,245,1)";
-const playerColor2 = "rgba(249,205,205,1)";
+// const playerColor1 = "rgba(245,245,245,1)";
+// const playerColor1 = "rgb(129,238,121)";
+const playerColor1 = "#2ee987";
+
+// const playerColor2 = "rgba(249,205,205,1)";
+const playerColor2 = "rgba(255, 216, 255, 0.7)";
+// const playerColor2 = "rgba(117,175,240,0.7)";
 const fieldColor = "rgba(244,172,100,0.8)";
 let lineColor = "rgba(205,3,43,0.7)";
-let lineColor1 = "rgba(256,0,100,0.4)";
+// let lineColor1 = "rgba(256,0,100,0.4)";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                             ФУНКЦИИ ЗАПОЛНЕНИЯ ПОЛЯ                                                */
@@ -41,7 +46,7 @@ function clearChip(ctx, x, y, radius) {
 }
 
 function drawChip(x, y, squareSideHalf, squareSide, color){
-    //Возможно имеет смысл поменять
+    //Возможно имеет смысл поменять // ЧТо поменять?
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(x + squareSide , y + squareSide / 2)
@@ -104,7 +109,6 @@ function fillRoundedRect00(ctx, x, y, w, h, r){
 
 function fillRoundedRect56(ctx, x, y, w, h, r){
     let halfW = w / 2;
-    let halfH = h / 2;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x + w, y);
@@ -170,7 +174,7 @@ function inAreaAndEmpty(area, x, y) {
     return area.busy === 0 && area.x1 <= x && x <= area.x2
         && area.y1 <= y && y < area.y2;
 }
-//Переписать без перебора всех значений
+
 function findArea(x, y){
     let i = 0;
     let j = 0;
@@ -376,11 +380,13 @@ class Game {
     }
 
     changePlayers(){
-        console.log("change");
+        // console.log("change");
         if (this.hasWinner){
             this.win();
         }
         else if (this.checkWinner(this.nums, this.player.chip)){
+            //Добавить появление кнопки рестарта
+            toVisible(document.getElementById("RestartButton"));
             this.hasWinner = true;
             this.player.winFlag = true;
             this.player.lastPos = {i: -1, j: -1};
@@ -520,6 +526,7 @@ class Game {
         }
         return false;
     }
+
     //Переработать функцию, скорее всего нужно будет это сделать
     // уже после подключения к spring boot
     win(){
@@ -537,6 +544,8 @@ class Game {
 }
 
 function clearCanvas(ctx, rect, num) {
+    // document.getElementById('RestartButton').hidden;
+    toHide(document.getElementById("RestartButton"));
     game.hasWinner = false;
     for (let i = 0; i < row; i++){
         for (let j = 0; j < col; j++){
@@ -569,7 +578,16 @@ function startGame() {
 
 function restartGame(){
     clearCanvas(ctx, field, game.nums);
-    console.log(game);
+    // console.log("Restart Game");
+    // console.log(game);
+}
+
+function toHide(elem){
+    elem.style.visibility = "hidden"
+}
+
+function toVisible(elem) {
+    elem.style.visibility = "visible"
 }
 
 let currentArea = undefined;
@@ -578,7 +596,13 @@ let numArr;
 let field;
 [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 startGame(game);
-console.log(field);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// console.log(field);
+////////////////////////////////////////////*////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*Добавить функционал:
+    * Ничья
+    * Автоматический проигрыш при выходе из игры*
+    * Расположить поле и информационную панель на одном уровне
+    *
+*/

@@ -3,23 +3,33 @@
     background: lightyellow;
     color: darksalmon;
 }
+#gameContent{
+    /*display: inline;*/
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0;
+    margin-bottom: 0;
+}
 
 #return {
     /*text-anchor: end;*/
     text-align: center;
     /*text-align: left;*/
-    font-size: 1.2em;
+    /*font-size: 1.2em;*/
+    font-size: 1.5vw;
     /*padding-top: 3em;*/
     /*padding-left: 2em;*/
     font-style: italic;
     font-weight: lighter;
-
-    border:1px solid #000000;
+    /*margin-top: 18vw;*/
+    display: block;
+    /*border:1px solid #000000;*/
 }
 
 #return a {
     text-decoration: none;
 }
+
 #return a:hover{
     text-align: right;
     color: #875235;
@@ -32,25 +42,39 @@
 /*    text-align: center;*/
 /*}*/
 #gamePanel {
-    border:1px solid #000000;
+    /*border: 1px solid #000000;*/
     text-align: center;
+    margin: 0 auto;
     /*width="200";*/
     /*height="100";*/
 }
+/*#canvas{*/
+/*    width: 850em;*/
+/*    height: 850px;*/
+/*}*/
 
 #gamePanel canvas{
     /*border:1px solid #000000;*/
     text-align: center;
+    width: 850px;
+    height: 850px;
+    /*height: 850px;*/
     /*width="200";*/
     /*height="100";*/
 }
 
 #infoPanel{
+    /*border:1px solid #000000;*/
+    margin: 4em auto;
     text-align: center;
     /*font-size: 1cm;*/
     /*font-size: 0.9%;*/
-    font-size: 0.9em;
+    /*font-size: 0.9em;*/
+    /*display: block;*/
 
+}
+#infoPanel p {
+    font-size: 1.5vw;
 }
 
 #SubmitButton{
@@ -59,7 +83,8 @@
     color: white;
     text-align: center;
     text-decoration: none;
-    font-size: 2em;
+    /*font-size: 2em;*/
+    font-size: 1.7vw;
     /*display: block;*/
     display: inline-block;
     margin: 0.5em auto;
@@ -90,10 +115,11 @@
     text-align: center;
     text-decoration: none;
     /*visibility: hidden;*/
-    visibility: visible;
-    font-size: 2em;
+    /*visibility: visible;*/
+    font-size: 1.7vw;
     /*display: block;*/
-    display: inline-block;
+    /*display: inline-block;*/
+    display: none;
     margin: 0.5em auto;
     width: 5em;
     height: 2em;
@@ -118,9 +144,14 @@
 /*transition*/
 /*opacity*/
 
-#canvas {
-    /*height: 50em;*/
-    /*width: 50em;*/
 
-    /*background-color: #cb2d3e;*/
+/*html {*/
+/*    overflow:  hidden;*/
+#infoPanel p#infoTitle{
+    text-align: center;
+    font-size: 4vw;
+    font-style: italic;
+    font-weight: bold;
+    display: block;
+    margin: 0 auto;
 }

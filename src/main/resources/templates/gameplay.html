@@ -3,36 +3,58 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="gameplay.css">
-
     <title>Four in a row/Gameplay</title>
 </head>
 <body>
-    <div id="gamePanel">
-        <canvas id="canvas" width="850" height="850">
-<!--            <script src="gameplay.js" type="text/javascript"></script>-->
+    <div id ="gameContent">
+        <div id="gamePanel">
+            <canvas id="canvas">
+                <noscript>Sorry, your browser does not support JavaScript!</noscript>
+            </canvas>
+    <!--        <canvas id="stockGraph" width="150" height="150">-->
+    <!--            <img src="kate.jpeg" width="405" height="405" alt=""/>-->
+    <!--        </canvas>-->
 
-            <noscript>Sorry, your browser does not support JavaScript!</noscript>
-        </canvas>
-<!--        <canvas id="stockGraph" width="150" height="150">-->
-<!--            <img src="kate.jpeg" width="405" height="405" alt=""/>-->
-<!--        </canvas>-->
+        </div>
 
-    </div>
-    <div id="infoPanel">
-        <p>
-            Some information
-        </p>
-        <button id="SubmitButton" onclick="game.changePlayers()">
-            Submit
-        </button>
-        <button id="RestartButton" onclick="restartGame(game)">
-            Restart
-        </button>
+        <div id="infoPanel">
+            <p id="infoTitle">
+                Four in a row
+            </p>
+            <p>
+                Current player:
+            </p>
+
+            <p>
+                Player1 color:
+            </p>
+
+            <p>
+                Player2 color:
+            </p>
+
+            <p>
+                Player1 wins:
+            </p>
+
+            <p>
+                Player2 wins:
+            </p>
+
+
+            <button id="SubmitButton" onclick="game.changePlayers()">
+                Submit
+            </button>
+            <button id="RestartButton" onclick="restartGame(game)">
+                Restart
+            </button>
+            <div id="return">
+                <a href="greeting.html">Return to menu</a>
+            </div>
+        </div>
     </div>
 
-    <div id="return">
-        <a href="greeting.html">Return to menu</a>
-    </div>
+
 
     <script type="text/javascript" src="gameplay.js"></script>
 </body>

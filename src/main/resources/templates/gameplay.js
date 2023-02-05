@@ -3,8 +3,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
+// console.log(innerHeight);
+// console.log(innerWidth);
+canvas.width = 850;
+canvas.height = 850;
 const canvasH = canvas.height
 const canvasW = canvas.width
+// ctx.scale(innerWidth / canvasH, innerHeight / canvasW);
 // Прописать зависимость от выбранного варианта
 const row = 6;
 const col = 7;
@@ -23,8 +28,9 @@ let limit = 7;
 
 // const playerColor1 = "rgba(245,245,245,1)";
 // const playerColor1 = "rgb(129,238,121)";
-const playerColor1 = "#2ee987";
-
+// const playerColor1 = "#2ee987";
+// const playerColor1 = "rgba(70,228,145,0.6)";
+const playerColor1 = "rgba(77,247,158,0.6)";
 // const playerColor2 = "rgba(249,205,205,1)";
 const playerColor2 = "rgba(255, 216, 255, 0.7)";
 // const playerColor2 = "rgba(117,175,240,0.7)";
@@ -243,12 +249,14 @@ function drawAndFallChip(chip, area, color){
     field[i][m].busy = chip;
     game.nums[i][m] = chip;
     game.player.lastPos = {i: i, j: m};
-    currentArea = undefined;
     game.player.numOfMoves++;
+    // currentArea = undefined;
+    console.log(`i = ${i}, n = ${n}`);
     if (i !== n){
         let pace = 150;
 
-        setTimeout(() => {clearChip(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
+        // setTimeout(() => {clearChip(ctx,arr[n][m].x1 + radius, arr[n][m].y1 + radius, radius);}, pace)
+        // setTimeout(() => {drawOrClearChip(true, currentArea)}, pace + 40);
 
         for (let k = n + 1; k < i; k++){
             if (field[k][m].busy === 0){
@@ -283,7 +291,15 @@ function drawAndFallChip(chip, area, color){
                 }
             }
         }, pace + 100);
+        // setTimeout(() => drawOrClearChip(true, currentArea), pace/ 2);
     }
+    else
+        currentArea = undefined;
+
+
+    // if (currentArea !== undefined){
+    //     drawOrClearChip(true, currentArea);
+    // }
 }
 
 canvas.onmousemove = function (e) {
@@ -398,8 +414,13 @@ class Game {
             this.player.numOfMoves = 0;
             this.player.lastPos = {i: -1, j: -1};
             this.player = this.playersList[this.getNextPlayerNum()];
+            if (currentArea !== undefined){
+                drawOrClearChip(false, currentArea);
+                drawOrClearChip(true, currentArea);
+            }
+            //Прописать проверку на цвет, чтобы если необходимо сменить цвет
         }
-        // console.log(game);
+        // console.log( game);
 
         //Здесь отсылать на сервер, если нет ошибок,
         // продолжить смену игроков и игру,
@@ -544,7 +565,6 @@ class Game {
 }
 
 function clearCanvas(ctx, rect, num) {
-    // document.getElementById('RestartButton').hidden;
     toHide(document.getElementById("RestartButton"));
     game.hasWinner = false;
     for (let i = 0; i < row; i++){
@@ -583,11 +603,11 @@ function restartGame(){
 }
 
 function toHide(elem){
-    elem.style.visibility = "hidden"
+    elem.style.display = "none"
 }
 
 function toVisible(elem) {
-    elem.style.visibility = "visible"
+    elem.style.display = "inline-block"
 }
 
 let currentArea = undefined;
@@ -596,13 +616,20 @@ let numArr;
 let field;
 [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 startGame(game);
-// console.log(field);
-////////////////////////////////////////////*////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*Добавить функционал:
-    * Ничья
-    * Автоматический проигрыш при выходе из игры*
-    * Расположить поле и информационную панель на одном уровне
-    *
+/*Добавить
+    Функционал:
+        * Ничья.
+        * Автоматический проигрыш при выходе из игры.
+        * Починить работу верхнего ряда +
+        * Счетчик времени каждого игрока
+    Визуал:
+        * Починить зеленый остаток от зеленой фишки
+        * Адаптивность поля
+        * Немного переделать ссылку возврата
+        * Обновлять то какой цвет показывается при смене игрока +
+        * Убрать выделение строчки при двойном клике
+        * Оставлять указатель фишки при падении +
 */

@@ -6,51 +6,61 @@
         <title>Four in a row/Gameplay</title>
     </head>
 <body>
-    <div id ="gameContent">
-        <div id="gamePanel">
-            <canvas id="canvas">
-                <noscript>Sorry, your browser does not support JavaScript!</noscript>
-            </canvas>
-            <!--        <canvas id="stockGraph" width="150" height="150">-->
-            <!--            <img src="kate.jpeg" width="405" height="405" alt=""/>-->
-            <!--        </canvas>-->
-        </div>
+   <div id="gameContent">
+
         <div id="infoPanel">
+
             <p id="infoTitle">
                 Four in a row
             </p>
-            <p>
-                Current player:
-            </p>
 
-            <p>
-                Player1 color:
-            </p>
+            <div id="statistic">
 
-            <p>
-                Player2 color:
-            </p>
+                <p id="currentPlayer">
+                    <!--                 Current player:-->
+                </p>
 
-            <p>
-                Player1 wins:
-            </p>
+                <p id="firstPlayerColor">
+                    <!--                Player1 color:-->
+                </p>
 
-            <p>
-                Player2 wins:
-            </p>
+                <p id="secondPlayerColor">
+                    <!--                Player2 color:-->
+                </p>
 
+                <p id="firstPlayerWins">
+                    <!--                Player1 wins:-->
+                </p>
 
-            <button id="SubmitButton" onclick="game.changePlayers()">
-                Submit
-            </button>
-            <button id="RestartButton" onclick="restartGame(game)">
-                Restart
-            </button>
-            <div id="return">
-                <a href="greeting.html">Return to menu</a>
+                <p id="secondPlayerWins">
+                    <!--                Player2 wins:-->
+                </p>
+
+            </div>
+
+            <div id="buttonsSection">
+                <button id="SubmitButton" class="buttons" onclick="game.changePlayers()">
+                    Submit
+                </button>
+
+                <button id="RestartButton" class="buttons" onclick="restartGame(game)">
+                    Restart
+                </button>
             </div>
         </div>
-    </div>
+       <div id="gamePanel">
+           <canvas id="canvas">
+               <noscript>Sorry, your browser does not support JavaScript!</noscript>
+           </canvas>
+       </div>
+   </div>
+
+
+
+   <div id="return">
+       <a href="greeting.html">Return to menu</a>
+   </div>
+
     <script type="text/javascript" src="js/gameplay.js"></script>
 </body>
 </html>

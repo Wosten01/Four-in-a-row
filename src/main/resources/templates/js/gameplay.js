@@ -35,7 +35,8 @@ const playerColor1 = "rgba(77,247,158,0.6)";
 const playerColor2 = "rgba(255, 216, 255, 0.7)";
 // const playerColor2 = "rgba(117,175,240,0.7)";
 const fieldColor = "rgba(244,172,100,0.8)";
-let lineColor = "rgba(205,3,43,0.7)";
+// let lineColor = "rgba(205,3,43,0.7)";
+let lineColor = "rgba(198,82,107,0.85)";
 // let lineColor1 = "rgba(256,0,100,0.4)";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +252,7 @@ function drawAndFallChip(chip, area, color){
     game.player.lastPos = {i: i, j: m};
     game.player.numOfMoves++;
     // currentArea = undefined;
-    console.log(`i = ${i}, n = ${n}`);
+    // console.log(`i = ${i}, n = ${n}`);
     if (i !== n){
         let pace = 150;
 
@@ -392,7 +393,21 @@ class Game {
         this.getPlayerNum();
         this.playersList.push(this.player);
         this.playersList.push(new Player("Денис", 2, playerColor2));
-        console.log(game);
+        // console.log(game);
+        let player1 = game.playersList[0];
+        let player2 = game.playersList[1];
+
+        document.getElementById("firstPlayerColor").innerHTML = `${player1.name}'s color`;
+        document.getElementById("firstPlayerColor").style.backgroundColor = player1.color;
+
+        document.getElementById("secondPlayerColor").innerHTML = `${player2.name}'s color:`;
+        document.getElementById("secondPlayerColor").style.backgroundColor = player2.color;
+
+        document.getElementById("currentPlayer").innerText = `Current player: ${game.player.name}`;
+        // document.getElementById("currentPlayer").style.backgroundColor = game.player.color;
+
+        document.getElementById("firstPlayerWins").innerHTML = `${player1.name}'s wins: ${player1.winRating}`
+        document.getElementById("secondPlayerWins").innerHTML = `${player2.name}'s wins: ${player2.winRating}`
     }
 
     changePlayers(){
@@ -407,6 +422,8 @@ class Game {
             this.player.winFlag = true;
             this.player.lastPos = {i: -1, j: -1};
             this.player.winRating += 1;
+            document.getElementById("firstPlayerWins").innerHTML = `${game.playersList[0].name}'s wins: ${game.playersList[0].winRating}`
+            document.getElementById("secondPlayerWins").innerHTML = `${game.playersList[1].name}'s wins: ${game.playersList[1].winRating}`
             this.block();
             this.win();
         }
@@ -418,6 +435,8 @@ class Game {
                 drawOrClearChip(false, currentArea);
                 drawOrClearChip(true, currentArea);
             }
+            document.getElementById("currentPlayer").innerText = `Current player: ${game.player.name}`;
+            // document.getElementById("currentPlayer").style.backgroundColor = game.player.color;
             //Прописать проверку на цвет, чтобы если необходимо сменить цвет
         }
         console.log( game);

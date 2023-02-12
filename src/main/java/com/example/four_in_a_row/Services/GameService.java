@@ -4,26 +4,22 @@ import com.example.four_in_a_row.Exceptions.InvalidGameException;
 import com.example.four_in_a_row.Exceptions.InvalidParamException;
 import com.example.four_in_a_row.Game.Game;
 import com.example.four_in_a_row.Game.GameStorage;
+import com.example.four_in_a_row.Game.LastChanges;
 import com.example.four_in_a_row.Game.Player;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 
-import static com.example.four_in_a_row.Game.GameStatus.IN_PROGRESS;
-import static com.example.four_in_a_row.Game.GameStatus.NEW;
+import static com.example.four_in_a_row.Game.GameStatus.*;
+
+
 
 @Service
 //@AllArgsConstructor
 public class GameService {
-
-    public GameStorage getIns(){
-        return GameStorage.getInstance();
-    }
     public Game createGame(Player player){
         Game game = new Game();
 
@@ -43,7 +39,7 @@ public class GameService {
         game.setId(SubWithDigitsAndLetters(4));
         game.setPlayer1(player);
         game.setStatus(NEW);
-        GameStorage.getInstance().setGames(game);
+        GameStorage.getInstance().setGame(game);
         return game;
     }
 
@@ -58,7 +54,7 @@ public class GameService {
         }
         game.setPlayer2(player);
         game.setStatus(IN_PROGRESS);
-        GameStorage.getInstance().setGames(game);
+        GameStorage.getInstance().setGame(game);
         //Чекнуть нужно ли
         return game;
     }
@@ -69,11 +65,11 @@ public class GameService {
                     .findFirst().orElseThrow(() -> new InvalidGameException("None of the games have started"));
         game.setPlayer2(player);
         game.setStatus(IN_PROGRESS);
-        GameStorage.getInstance().setGames(game);
+        GameStorage.getInstance().setGame(game);
         return game;
     }
 
-    public static String SubWithDigitsAndLetters(int n) {
+    private static String SubWithDigitsAndLetters(int n) {
         Random random = new Random();
         StringBuilder str = new StringBuilder();
 
@@ -90,12 +86,145 @@ public class GameService {
         return str.toString();
     }
 
-    public static Game gameplay(Game game){
-        game.setField(game.getField());
+    public Game gameplay(LastChanges lastChanges) throws InvalidParamException, InvalidGameException {
+        String id = lastChanges.getGameId();
+
+        if (!GameStorage.getInstance().getGames().containsKey(id)) {
+            throw new InvalidParamException("Game not found");
+        }
+
+        Game game = GameStorage.getInstance().getGames().get(id);
+        if (game.getStatus().equals(FINISHED)) {
+            throw new InvalidGameException("Game is already finished");
+        }
+        ArrayList<int[]> coordinates = lastChanges.getCoordinates();
+
+        int chip = lastChanges.getPlayerNum();
+        int[][] field = game.getField();
+        for (int[] coordinate : coordinates) {
+            field[coordinate[0]][coordinate[1]] = chip;
+        }
+//        Boolean xWinner = checkWinner(game.getBoard(), TicToe.X);
+//        Boolean oWinner = checkWinner(game.getBoard(), TicToe.O);
+//
+        if (checkWinner(field, chip)) {
+            game.setWinner(chip);
+        }
+        game.setWinFlag(true);
+        GameStorage.getInstance().setGame(game);
         return game;
+    }
+
+    private boolean checkWinner(int[][] nums, int chip){
+        int c = 0;
+        //Проход по массиву по горизонталям
+        for (int i = 0; i < row; i++) {
+            int j = 0;
+            while (j < col && col - j + c >= 4) {
+                if (chip == nums[i][j]){
+                    c++;
+                    if (c == 4){
+                        // console.log("Г")
+                        return true;
+                    }
+                }
+                else{
+                    c = 0;
+                }
+                j++;
+            }
+            j = 0;
+            c = 0;
+        }
+        //Проход по массиву по вертикали
+        for (int j = 0; j < col; j++) {
+            int i = row - 1;
+            while (i >= 0 && c + i + 1 >= 4) {
+                if (chip == 0) {
+                    c = 0;
+                    break;
+                }
+                else if (chip == nums[i][j]){
+                    c++;
+                    if (c == 4){
+                        c = 0;
+                        // console.log("В");
+                        return true;
+                    }
+                }
+                i--;
+            }
+            i = row - 1;
+            c = 0;
+        }
+
+        //Проход по массиву по диагонали от левого края
+        int j = 0;
+        int i = row / 2;
+        int k;
+        int m;
+        c = 0;
+        while(j < (col - 1) / 2){
+
+            if (i > 0){
+                i--;
+            }
+            else{
+                j++;
+            }
+            k = i;
+            m = j;
+            while (k < row && m < col){
+                if (chip == nums[k][m]){
+                    c++;
+                    if (c == 4){
+                        // console.log("ПД");
+                        return true;
+                    }
+                }
+                else{
+                    c = 0;
+                }
+                k++;
+                m++;
+            }
+            c = 0;
+        }
+
+        //Проход по массиву по диагонали от правого края
+        i = row / 2;
+        j = col - 1;
+        while(j > (col - 1) / 2 ){
+            if (i > 0){
+                i--;
+            }
+            else{
+                j--;
+            }
+            k = i;
+            m = j;
+            while (k < row && m >= 0){
+                if (chip == nums[k][m]){
+                    c++;
+                    if (c == 4){
+                        // console.log("ОД");
+                        return true;
+                    }
+                }
+                else{
+                    c = 0;
+                }
+                k++;
+                m--;
+            }
+            c = 0;
+        }
+        return false;
     }
 
 
     // Обработать уход игрока из игры
     // Правильно обработать рефреш
+    private static final int row = 6;
+    private static final int col = 7;
 }

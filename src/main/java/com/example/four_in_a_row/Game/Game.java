@@ -12,6 +12,7 @@ public class Game {
     private GameStatus status;
     //Если что подредактировать
     private int[][] field;
+    private int winner;
     private boolean winFlag;
     //Подумать как заполнить board заранее
 }

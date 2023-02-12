@@ -420,7 +420,7 @@ class Game {
             }
             //Прописать проверку на цвет, чтобы если необходимо сменить цвет
         }
-        // console.log( game);
+        console.log( game);
 
         //Здесь отсылать на сервер, если нет ошибок,
         // продолжить смену игроков и игру,
@@ -450,7 +450,7 @@ class Game {
                 if (chip === nums[i][j]){
                     c++;
                     if (c === 4){
-                        // console.log("Г")
+                        console.log("Г")
                         return true;
                     }
                 }
@@ -466,17 +466,16 @@ class Game {
         for (let j = 0; j < col; j++) {
             let i = row - 1;
             while (i >= 0 && c + i + 1 >= 4) {
-                if (chip === 0) {
-                    c = 0;
-                    break;
-                }
-                else if (chip === nums[i][j]){
+                if (chip === nums[i][j]){
                     c++;
                     if (c === 4){
                         c = 0;
-                        // console.log("В");
+                        console.log("В");
                         return true;
                     }
+                }
+                else {
+                    c = 0;
                 }
                 i--;
             }
@@ -504,7 +503,7 @@ class Game {
                 if (chip === nums[k][m]){
                     c++;
                     if (c === 4){
-                        // console.log("ПД");
+                        console.log("ПД");
                         return true
                     }
                 }
@@ -533,7 +532,7 @@ class Game {
                 if (chip === nums[k][m]){
                     c++;
                     if (c === 4){
-                        // console.log("ОД");
+                        console.log("ОД");
                         return true
                     }
                 }
@@ -599,7 +598,7 @@ function startGame() {
 function restartGame(){
     clearCanvas(ctx, field, game.nums);
     // console.log("Restart Game");
-    // console.log(game);
+    console.log(game);
 }
 
 function toHide(elem){

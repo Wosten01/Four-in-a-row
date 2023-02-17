@@ -1,4 +1,4 @@
-package com.example.four_in_a_row.Game;
+package com.example.four_in_a_row.Game.DTO;
 
 
 import lombok.Data;

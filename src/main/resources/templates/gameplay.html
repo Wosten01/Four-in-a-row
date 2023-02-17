@@ -2,8 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link rel="stylesheet" href="css/gameplay.css">
-        <title>Four in a row/Gameplay</title>
+        <link rel="stylesheet" href="/static/css/gameplay.css" th:href="@{/css/gameplay.css}">
+<!--        <link rel="stylesheet" href="/static/css/gameplay.css" href="/static/css/gameplay.css">-->
+        <title>Four in a row/g</title>
     </head>
 <body>
    <div id="gameContent">
@@ -15,6 +16,9 @@
             </p>
 
             <div id="statistic">
+                <p id="idToPlay">
+
+                </p>
 
                 <p id="currentPlayer">
                     <!--                 Current player:-->
@@ -61,6 +65,8 @@
        <a href="greeting.html">Return to menu</a>
    </div>
 
-    <script type="text/javascript" src="js/gameplay.js"></script>
+    <script type="text/javascript"  th:href="@{/js/gameplay.js}"></script>
+<!--   <script type="text/javascript"  src="/static/js/gameplay.js"></script>-->
+<!--   src="/static/js/gameplay.js"-->
 </body>
 </html>

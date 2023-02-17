@@ -2,8 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="css/greeting.css">
+    <link rel="stylesheet" href="/static/css/greeting.css" th:href="@{/css/greeting.css}">
     <title>Four in a row </title>
+    <!--    libs for stomp and sockjs-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" type="text/javascript"></script>
+    <!--    end libs for stomp and sockjs-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -13,17 +18,22 @@
 <!--            Four in a row-->
 <!--            Main menu-->
             <legend>Four in a row</legend>
-            <p><a href="gameplay.html">Game with bot</a></p>
-            <p><a href="gameplay.html">Game with random player</a></p>
-            <p><a href="gameplay.html">Game with player</a></p>
+            <label for="login"></label><input id="login" placeholder="Place a login here"/>
+            <p><a>Game with bot</a></p>
+            <p><a onclick="connectToRandom()">Game with random player</a></p>
+            <p><a onclick="createGame()">New game with player</a></p>
+<!--            <p><button onclick="createGame()">New game with player</button></p>-->
+            <p><a onclick="connectToSpecificGame()">Game with player</a> <label
+                    for="gameId"></label><input id="gameId" placeholder="Enter the Game ID"/></p>
             <p><a href="Statistic.html">Statistic</a></p>
         </fieldset>
     </div>
-
     <div id="footer">
         <footer>
             <p>@2023</p>
         </footer>
     </div>
+<script  type="text/javascript" th:src="@{/js/socket.js}"></script>
+<!--    src="/static/js/socket.js"-->
 </body>
 </html>

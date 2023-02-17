@@ -388,11 +388,11 @@ class Game {
         return this.playerNum;
     }
 
-    setupGame(){
-        this.player = new Player("Иван", 1, playerColor1);
+    setupGame(login1, login2){
+        this.player = new Player(login1, 1, playerColor1);
         this.getPlayerNum();
         this.playersList.push(this.player);
-        this.playersList.push(new Player("Денис", 2, playerColor2));
+        this.playersList.push(new Player(login2, 2, playerColor2));
         // console.log(game);
         let player1 = game.playersList[0];
         let player2 = game.playersList[1];
@@ -609,9 +609,9 @@ function clearCanvas(ctx, rect, num) {
 
 }
 
-function startGame() {
-    game = new Game(123, numArr);
-    game.setupGame();
+function startGame(id) {
+    game = new Game(id, numArr);
+    game.setupGame(login1, login2);
 }
 
 function restartGame(){
@@ -633,7 +633,9 @@ let game;
 let numArr;
 let field;
 [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
-startGame(game);
+login1 = "Иван";
+login2 = "Денис";
+startGame();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

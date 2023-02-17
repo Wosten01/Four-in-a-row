@@ -4,7 +4,7 @@ import com.example.four_in_a_row.Exceptions.InvalidGameException;
 import com.example.four_in_a_row.Exceptions.InvalidParamException;
 import com.example.four_in_a_row.Game.Game;
 import com.example.four_in_a_row.Game.GameStorage;
-import com.example.four_in_a_row.Game.LastChanges;
+import com.example.four_in_a_row.Game.DTO.LastChanges;
 import com.example.four_in_a_row.Game.Player;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,9 @@ import static com.example.four_in_a_row.Game.GameStatus.*;
 @Service
 //@AllArgsConstructor
 public class GameService {
+
+//    private final GameStorage gameStorage;
+
     public Game createGame(Player player){
         Game game = new Game();
 

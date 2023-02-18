@@ -10,6 +10,7 @@ import com.example.four_in_a_row.Services.GameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -58,12 +59,15 @@ public class GameController {
         return ResponseEntity.ok(gameService.connectToRandomGame(player));
     }
 
+
+
     @ResponseBody
-    @PostMapping("/gameplay/{id}")
-    public ResponseEntity<Game> gameplay (@RequestBody LastChanges request, @PathVariable String id) throws InvalidGameException, InvalidParamException {
+    @PostMapping("/gameplay")
+//    @MessageMapping()
+    public ResponseEntity<Game> gameplay (@RequestBody LastChanges request) throws InvalidGameException, InvalidParamException {
         log.info("gameplay: {}", request);
         Game game = gameService.gameplay(request);
-        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getId(), game);
+        simpMessagingTemplate.convertAndSend("/player/game-progress/" + game.getId(), game);
         return ResponseEntity.ok(game);
     }
 }

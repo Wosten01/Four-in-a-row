@@ -8,18 +8,24 @@ let login2;
 
 function connectToSocket(gameId){
     console.log("Connecting to the game");
-    let socket = new SockJS(url + "/gameplay/" + gameId);
+    let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame){
         console.log("connected to the frame: " + frame);
-        stompClient.subscribe("/topic/game-progress/" + gameId, function (response){
+
+        stompClient.subscribe("/player/game-progress/" + gameId, function (response){
             let data = JSON.parse(response.body);
             console.log(data);
-        })
+            // displayResponse(data);
+        });
+        window.location.href = "/game/" + gameId;
         }
-
+        , function (error){
+            console.log(error)
+        }
     )
 }
+
 
 function createGame(){
     let login = document.getElementById("login").value;
@@ -40,8 +46,8 @@ function createGame(){
                 playerNum = 1;
                 //Возможно что-то добавить
                 connectToSocket(gameId);
-                alert("You're created a game. Game id is: " + gameId);
-                window.location.href = "/game/" + gameId ;
+                alert("You're created a game: Game id is: " + data.id);
+                // canIMove = true;
             },
             error: function (error){
                 alert("Something goes wrong, check console!");
@@ -73,9 +79,7 @@ function connectToRandom(){
                 connectToSocket(gameId);
                 // console.log(data.player1.login);
                 alert("You're playing with:" +  data.player1.login);
-                window.location.href = "/game/" + gameId;
-                // console.log(window.document.title);
-                // window.document.getElementById("idToPlay").innerHTML = `ID: ${gameId}}`;
+                isSecondPlayerConnect = true;
             },
             error: function (error){
                 alert("Something goes wrong, check console!");
@@ -111,8 +115,10 @@ function connectToSpecificGame(){
                 playerNum = 2;
                 //Возможно что-то добавить
                 connectToSocket(gameId);
-                alert("You're playing with:" +  data.player1.login)
-                window.location.href = "/game/" + gameId;
+                alert("You're playing with:" +  data.player1.login);
+                isSecondPlayerConnect = true;
+                //Продумать этот момент
+                // startGame(data.id, data.player1.login, data.player2.login);
                 },
             error: function (error){
                 alert("Something goes wrong, check console!");

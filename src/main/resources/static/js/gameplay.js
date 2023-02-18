@@ -304,43 +304,49 @@ function drawAndFallChip(chip, area, color){
 }
 
 canvas.onmousemove = function (e) {
-    let x = e.pageX - canvas.offsetLeft;
-    let y = e.pageY - canvas.offsetTop;
+    if (game !== undefined) {
+        let x = e.pageX - canvas.offsetLeft;
+        let y = e.pageY - canvas.offsetTop;
 
-    if (currentArea === undefined) {
-        let newCurrArea = findArea(x, y);
-        if (newCurrArea !== undefined){
-            // Случай, когда нужно нарисовать фишку
-            drawOrClearChip(true, newCurrArea, x, y);
-            currentArea = newCurrArea;
-        }
-    } else {
-        if (!inAreaAndEmpty(currentArea, x, y)){
-            drawOrClearChip(false, currentArea);
-            currentArea = undefined;
+        if (currentArea === undefined) {
+            let newCurrArea = findArea(x, y);
+            if (newCurrArea !== undefined) {
+                // Случай, когда нужно нарисовать фишку
+                drawOrClearChip(true, newCurrArea, x, y);
+                currentArea = newCurrArea;
+            }
+        } else {
+            if (!inAreaAndEmpty(currentArea, x, y)) {
+                drawOrClearChip(false, currentArea);
+                currentArea = undefined;
+            }
         }
     }
 }
 
 canvas.onmousedown = function () {
-    if (game.player.numOfMoves < limit && currentArea !== undefined){
-        drawAndFallChip(game.player.chip, currentArea, game.player.color);
+    if (game !== undefined) {
+        if (game.player.numOfMoves < limit && currentArea !== undefined) {
+            drawAndFallChip(game.player.chip, currentArea, game.player.color);
+        }
     }
 }
 
 canvas.ondblclick = function (e){
-    clearSelection();
-    if (game.player.lastPos.i !== -1 && game.player.lastPos.j !== -1 ) {
-        let x = e.pageX - canvas.offsetLeft;
-        let y = e.pageY - canvas.offsetTop;
-        let pos = game.player.lastPos;
-        let area = field[pos.i][pos.j];
+    if (game !== undefined) {
+        clearSelection();
+        if (game.player.lastPos.i !== -1 && game.player.lastPos.j !== -1) {
+            let x = e.pageX - canvas.offsetLeft;
+            let y = e.pageY - canvas.offsetTop;
+            let pos = game.player.lastPos;
+            let area = field[pos.i][pos.j];
 
-        if (inArea(area, x, y)){
-            clearChip(ctx, area.x1 + radius, area.y1 + radius, radius);
-            game.player.numOfMoves--;
-            field[pos.i][pos.j].busy = 0;
-            game.nums[pos.i][pos.j] = 0;
+            if (inArea(area, x, y)) {
+                clearChip(ctx, area.x1 + radius, area.y1 + radius, radius);
+                game.player.numOfMoves--;
+                field[pos.i][pos.j].busy = 0;
+                game.nums[pos.i][pos.j] = 0;
+            }
         }
     }
 }
@@ -609,7 +615,7 @@ function clearCanvas(ctx, rect, num) {
 
 }
 
-function startGame(id) {
+function startGame(id, login1, login2) {
     game = new Game(id, numArr);
     game.setupGame(login1, login2);
 }
@@ -632,10 +638,40 @@ let currentArea = undefined;
 let game;
 let numArr;
 let field;
-[field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
+// [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
 login1 = "Иван";
 login2 = "Денис";
-startGame();
+let canIMove = false;
+let isSecondPlayerConnect = false;
+// startGame();
+
+
+function change(){
+    console.log(`canIMove = ${canIMove}`);
+    console.log(`isSecondPlayerConnect = ${isSecondPlayerConnect}`);
+    if (canIMove && isSecondPlayerConnect){
+        $.ajax({
+            url: url + "/gameplay",
+            type: 'POST',
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                "type": type,
+                "coordinateX": xCoordinate,
+                "coordinateY": yCoordinate,
+                "gameId": gameId
+            }),
+            success: function (data) {
+
+                gameOn = false;
+                displayResponse(data);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -645,7 +681,9 @@ startGame();
         * Автоматический проигрыш при выходе из игры.
         * Починить работу верхнего ряда +
         * Счетчик времени каждого игрока
+        *
     Визуал:
+        * Добавить окно ожидания при подключении только одного игрока
         * Починить зеленый остаток от зеленой фишки
         * Адаптивность поля
         * Немного переделать ссылку возврата

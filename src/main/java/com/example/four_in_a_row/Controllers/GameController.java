@@ -43,6 +43,13 @@ public class GameController {
 //        gameplayPage();
         return ResponseEntity.ok(gameService.createGame(player));
     }
+    @ResponseBody
+    @PostMapping("/connect/split_screen")
+    public ResponseEntity<Game> startSplitScreen(@RequestBody Player player1, @RequestBody Player player2){
+        log.info("Start game request: {} + {} -> Split Screen Game",player1, player2);
+//        gameplayPage();
+        return ResponseEntity.ok(gameService.connectToSplitScreenGame(player1, player2));
+    }
 //
     @ResponseBody
     @PostMapping("/connect")
@@ -66,7 +73,7 @@ public class GameController {
 //    @MessageMapping()
     public ResponseEntity<Game> gameplay (@RequestBody LastChanges request) throws InvalidGameException, InvalidParamException {
         log.info("gameplay: {}", request);
-        Game game = gameService.gameplay(request);
+        Game game = gameService.changePlayer(request);
         simpMessagingTemplate.convertAndSend("/player/game-progress/" + game.getId(), game);
         return ResponseEntity.ok(game);
     }

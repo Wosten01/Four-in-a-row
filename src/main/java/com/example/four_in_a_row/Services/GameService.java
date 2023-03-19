@@ -6,7 +6,7 @@ import com.example.four_in_a_row.Game.Game;
 import com.example.four_in_a_row.Game.GameStorage;
 import com.example.four_in_a_row.Game.DTO.LastChanges;
 import com.example.four_in_a_row.Game.Player;
-import lombok.AllArgsConstructor;
+//import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
@@ -37,7 +37,7 @@ public class GameService {
 //        System.out.println(res);
         //Попробовать написать не через фор а как-нибудь через стримы
 //        Arrays.fill(list, new ArrayList<Integer>() {0});
-        game.setField(new int[6][7]);
+        game.setField(new int[row][col]);
 //        game.setId(UUID.randomUUID().toString());
         game.setId(SubWithDigitsAndLetters(4));
         game.setPlayer1(player);
@@ -72,6 +72,18 @@ public class GameService {
         return game;
     }
 
+    public Game connectToSplitScreenGame(Player player1, Player player2){
+        Game game = new Game();
+        game.setField(new int[row][col]);
+        game.setId(SubWithDigitsAndLetters(4));
+        game.setPlayer1(player1);
+        game.setPlayer2(player2);
+        game.setStatus(IN_PROGRESS);
+//        GameStorage.getInstance().setGame(game);
+        return game;
+    }
+
+
     private static String SubWithDigitsAndLetters(int n) {
         Random random = new Random();
         StringBuilder str = new StringBuilder();
@@ -89,7 +101,7 @@ public class GameService {
         return str.toString();
     }
 
-    public Game gameplay(LastChanges lastChanges) throws InvalidParamException, InvalidGameException {
+    public Game changePlayer(LastChanges lastChanges) throws InvalidParamException, InvalidGameException {
         String id = lastChanges.getGameId();
 
         if (!GameStorage.getInstance().getGames().containsKey(id)) {
@@ -112,11 +124,17 @@ public class GameService {
 //
         if (checkWinner(field, chip)) {
             game.setWinner(chip);
+            game.setWinFlag(true);
         }
-        game.setWinFlag(true);
+//        game.setWinFlag(true);
         GameStorage.getInstance().setGame(game);
         return game;
     }
+
+//    public Game changePlayer(){
+//
+//    }
+
 
     private boolean checkWinner(int[][] nums, int chip){
         int c = 0;
@@ -136,7 +154,7 @@ public class GameService {
                 }
                 j++;
             }
-            j = 0;
+//            j = 0;
             c = 0;
         }
         //Проход по массиву по вертикали
@@ -144,20 +162,20 @@ public class GameService {
             int i = row - 1;
             while (i >= 0 && c + i + 1 >= 4) {
                 if (chip == 0) {
-                    c = 0;
+//                    c = 0;
                     break;
                 }
                 else if (chip == nums[i][j]){
                     c++;
                     if (c == 4){
-                        c = 0;
+//                        c = 0;
                         // console.log("В");
                         return true;
                     }
                 }
                 i--;
             }
-            i = row - 1;
+//            i = row - 1;
             c = 0;
         }
 
@@ -166,7 +184,7 @@ public class GameService {
         int i = row / 2;
         int k;
         int m;
-        c = 0;
+//        c = 0;
         while(j < (col - 1) / 2){
 
             if (i > 0){
@@ -227,7 +245,7 @@ public class GameService {
 
 
     // Обработать уход игрока из игры
-    // Правильно обработать рефреш
+    // Правильно обработать ре фреш
     private static final int row = 6;
     private static final int col = 7;
 }

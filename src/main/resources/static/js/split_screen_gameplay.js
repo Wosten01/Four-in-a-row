@@ -1,7 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ И КОНСТАНТ                                        */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+// console.log(innerHeight);
+// console.log(innerWidth);
+canvas.width = 850;
+canvas.height = 850;
 const canvasH = canvas.height
 const canvasW = canvas.width
 // ctx.scale(innerWidth / canvasH, innerHeight / canvasW);
@@ -53,7 +58,7 @@ function drawChip(x, y, squareSideHalf, squareSide, color){
     ctx.beginPath();
     ctx.moveTo(x + squareSide , y + squareSide / 2)
     ctx.arc(x + squareSide / 2, y + squareSide / 2, radius,
-            0, Math.PI * 2, true);
+        0, Math.PI * 2, true);
     ctx.fillStyle = color;
     ctx.fill();
     ctx.closePath();
@@ -152,7 +157,7 @@ function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineCol
         for (let j = 0; j < col; j++){
             drawRectWithHole(x, y, squareSide, squareSideHalf, fieldColor, i, j);
             arrayRect[i].push({x1: x + leftRectIndent,x2: x + rightRectIndent,
-                               y1: y + leftRectIndent, y2 : y + rightRectIndent, busy : 0})
+                y1: y + leftRectIndent, y2 : y + rightRectIndent, busy : 0})
             x += squareSide;
             num[i].push(0);
         }
@@ -257,9 +262,9 @@ function drawAndFallChip(chip, area, color){
         for (let k = n + 1; k < i; k++){
             if (field[k][m].busy === 0){
                 setTimeout(() => {drawChip(arr[k][m].x1, arr[k][m].y1, radius, diameter, color);},
-                                  -100 + pace);
+                    -100 + pace);
                 setTimeout(() => {clearChip(ctx,arr[k][m].x1 + radius, arr[k][m].y1 + radius, radius);},
-                                  50 + pace);
+                    50 + pace);
             }
             pace += 100;
         }
@@ -276,9 +281,9 @@ function drawAndFallChip(chip, area, color){
                     for (let j = 0; j < row; j++){
                         if (field[i][j].busy === chip){
                             pix = ctx.getImageData(field[i][j].x1 + radius,
-                                                   field[i][j].y1 + radius,
-                                                   1,
-                                                   1).data;
+                                field[i][j].y1 + radius,
+                                1,
+                                1).data;
                             if (pix[0] !== color[0]*1 && pix[1] !== color[1]*1 && pix[2] !== color[2]*1){
                                 drawChip(arr[i][j].x1, arr[i][j].y1, radius, diameter, color);
                             }
@@ -611,10 +616,6 @@ function clearCanvas(ctx, rect, num) {
 }
 
 function startGame(id, login1, login2) {
-    let canvas = document.getElementById("canvas");
-    let ctx = canvas.getContext("2d");
-    canvas.width = 850;
-    canvas.height = 850;
     game = new Game(id, numArr);
     game.setupGame(login1, login2);
 }
@@ -633,16 +634,44 @@ function toVisible(elem) {
     elem.style.display = "inline-block"
 }
 
-// let currentArea = undefined;
-// let game;
-// let numArr;
-// let field;
-// [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
-// login1 = "Иван";
-// login2 = "Денис";
-// let canIMove = false;
-// let isSecondPlayerConnect = false;
+let currentArea = undefined;
+let game;
+let numArr;
+let field;
+[field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
+login1 = "Иван";
+login2 = "Денис";
+let canIMove = false;
+let isSecondPlayerConnect = false;
 startGame();
+
+
+// function change(){
+//     console.log(`canIMove = ${canIMove}`);
+//     console.log(`isSecondPlayerConnect = ${isSecondPlayerConnect}`);
+//     if (canIMove && isSecondPlayerConnect){
+//         $.ajax({
+//             url: url + "/gameplay",
+//             type: 'POST',
+//             dataType: "json",
+//             contentType: "application/json",
+//             data: JSON.stringify({
+//                 "type": type,
+//                 "coordinateX": xCoordinate,
+//                 "coordinateY": yCoordinate,
+//                 "gameId": gameId
+//             }),
+//             success: function (data) {
+//
+//                 gameOn = false;
+//                 displayResponse(data);
+//             },
+//             error: function (error) {
+//                 console.log(error);
+//             }
+//         })
+//     }
+// }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

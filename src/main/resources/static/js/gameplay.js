@@ -1,9 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ И КОНСТАНТ                                        */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+canvas.width = 850;
+canvas.height = 850;
 const canvasH = canvas.height
 const canvasW = canvas.width
+const url = 'http://localhost:8080'
 // ctx.scale(innerWidth / canvasH, innerHeight / canvasW);
 // Прописать зависимость от выбранного варианта
 const row = 6;
@@ -461,126 +465,126 @@ class Game {
 
     // Сделать более оптимизированную проверку диагоналей (в целом и так норм, можно и забить)
     //Обработать ничью
-    checkWinner(nums, chip){
-        let c = 0;
-        //Проход по массиву по горизонталям
-        for (let i = 0; i < row; i++) {
-            let j = 0;
-            while (j < col && col - j + c >= 4) {
-                if (chip === nums[i][j]){
-                    c++;
-                    if (c === 4){
-                        console.log("Г")
-                        return true;
-                    }
-                }
-                else{
-                    c = 0;
-                }
-                j++;
-            }
-            j = 0;
-            c = 0;
-        }
-        //Проход по массиву по вертикали
-        for (let j = 0; j < col; j++) {
-            let i = row - 1;
-            while (i >= 0 && c + i + 1 >= 4) {
-                if (chip === nums[i][j]){
-                    c++;
-                    if (c === 4){
-                        c = 0;
-                        console.log("В");
-                        return true;
-                    }
-                }
-                else {
-                    c = 0;
-                }
-                i--;
-            }
-            i = row - 1;
-            c = 0;
-        }
-
-        //Проход по массиву по диагонали от левого края
-        let j = 0;
-        let i = row / 2;
-        let k;
-        let m;
-        c = 0;
-        while(j < (col - 1) / 2){
-
-            if (i > 0){
-                i--;
-            }
-            else{
-                j++;
-            }
-            k = i;
-            m = j;
-            while (k < row && m < col){
-                if (chip === nums[k][m]){
-                    c++;
-                    if (c === 4){
-                        console.log("ПД");
-                        return true
-                    }
-                }
-                else{
-                    c = 0;
-                }
-                k++;
-                m++;
-            }
-            c = 0;
-        }
-
-        //Проход по массиву по диагонали от правого края
-        i = row / 2;
-        j = col - 1;
-        while(j > (col - 1) / 2 ){
-            if (i > 0){
-                i--;
-            }
-            else{
-                j--;
-            }
-            k = i;
-            m = j;
-            while (k < row && m >= 0){
-                if (chip === nums[k][m]){
-                    c++;
-                    if (c === 4){
-                        console.log("ОД");
-                        return true
-                    }
-                }
-                else{
-                    c = 0;
-                }
-                k++;
-                m--;
-            }
-            c = 0;
-        }
-        return false;
-    }
-
-    //Переработать функцию, скорее всего нужно будет это сделать
-    // уже после подключения к spring boot
-    win(){
-        this.banner()
-    }
-
-    banner(){
-        if (game.player.winFlag){
-            alert(`Congratulations, ${game.player.name}, you are Winner`)
-        }
-        else {
-            alert(`Sorry, ${game.player.name}, but you lose`)
-        }
-    }
+//     checkWinner(nums, chip){
+//         let c = 0;
+//         //Проход по массиву по горизонталям
+//         for (let i = 0; i < row; i++) {
+//             let j = 0;
+//             while (j < col && col - j + c >= 4) {
+//                 if (chip === nums[i][j]){
+//                     c++;
+//                     if (c === 4){
+//                         console.log("Г")
+//                         return true;
+//                     }
+//                 }
+//                 else{
+//                     c = 0;
+//                 }
+//                 j++;
+//             }
+//             j = 0;
+//             c = 0;
+//         }
+//         //Проход по массиву по вертикали
+//         for (let j = 0; j < col; j++) {
+//             let i = row - 1;
+//             while (i >= 0 && c + i + 1 >= 4) {
+//                 if (chip === nums[i][j]){
+//                     c++;
+//                     if (c === 4){
+//                         c = 0;
+//                         console.log("В");
+//                         return true;
+//                     }
+//                 }
+//                 else {
+//                     c = 0;
+//                 }
+//                 i--;
+//             }
+//             i = row - 1;
+//             c = 0;
+//         }
+//
+//         //Проход по массиву по диагонали от левого края
+//         let j = 0;
+//         let i = row / 2;
+//         let k;
+//         let m;
+//         c = 0;
+//         while(j < (col - 1) / 2){
+//
+//             if (i > 0){
+//                 i--;
+//             }
+//             else{
+//                 j++;
+//             }
+//             k = i;
+//             m = j;
+//             while (k < row && m < col){
+//                 if (chip === nums[k][m]){
+//                     c++;
+//                     if (c === 4){
+//                         console.log("ПД");
+//                         return true
+//                     }
+//                 }
+//                 else{
+//                     c = 0;
+//                 }
+//                 k++;
+//                 m++;
+//             }
+//             c = 0;
+//         }
+//
+//         //Проход по массиву по диагонали от правого края
+//         i = row / 2;
+//         j = col - 1;
+//         while(j > (col - 1) / 2 ){
+//             if (i > 0){
+//                 i--;
+//             }
+//             else{
+//                 j--;
+//             }
+//             k = i;
+//             m = j;
+//             while (k < row && m >= 0){
+//                 if (chip === nums[k][m]){
+//                     c++;
+//                     if (c === 4){
+//                         console.log("ОД");
+//                         return true
+//                     }
+//                 }
+//                 else{
+//                     c = 0;
+//                 }
+//                 k++;
+//                 m--;
+//             }
+//             c = 0;
+//         }
+//         return false;
+//     }
+//
+//     //Переработать функцию, скорее всего нужно будет это сделать
+//     // уже после подключения к spring boot
+//     win(){
+//         this.banner()
+//     }
+//
+//     banner(){
+//         if (game.player.winFlag){
+//             alert(`Congratulations, ${game.player.name}, you are Winner`)
+//         }
+//         else {
+//             alert(`Sorry, ${game.player.name}, but you lose`)
+//         }
+//     }
 }
 
 function clearCanvas(ctx, rect, num) {
@@ -611,10 +615,7 @@ function clearCanvas(ctx, rect, num) {
 }
 
 function startGame(id, login1, login2) {
-    let canvas = document.getElementById("canvas");
-    let ctx = canvas.getContext("2d");
-    canvas.width = 850;
-    canvas.height = 850;
+    [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
     game = new Game(id, numArr);
     game.setupGame(login1, login2);
 }
@@ -633,16 +634,53 @@ function toVisible(elem) {
     elem.style.display = "inline-block"
 }
 
-// let currentArea = undefined;
-// let game;
-// let numArr;
-// let field;
-// [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
+function setupPage(){
+    let cookies = document.cookie.split(";");
+    console.log(cookies);
+    console.log("Gameplay connecting");
+    gameId = cookies[0].split("=")[1];
+    console.log(gameId);
+    let socket = new SockJS(url + "/ws");
+    stompClient = Stomp.over(socket);
+    console.log(`/topic/gameplay/${gameId}`);
+    stompClient.connect({}, function (frame){
+            console.log("connected to the frame: " + frame);
+            stompClient.subscribe(`/topic/gameplay/${gameId}`, function (response){
+                let data = JSON.parse(response.body);
+                console.log(data);
+            });
+        }
+        , function (error){
+            console.log(error)
+        }
+    )
+    $.ajax({
+        url: url + `/game/${gameId}`,
+        type: "POST",
+        dataType: "JSON",
+        contentType: "application/json",
+        success: function(data) {
+            // console.log(`help${response.toString()}`);
+            // let data = JSON.parse(response.body)
+            console.log(`${data.player1.login}, ${data.player2.login}`)
+            startGame(0, data.player1.login, data.player2.login);
+        },
+        error: function (error){
+            alert("Something goes wrong, check console!");
+            console.log(error);
+        }
+    });
+}
+
+let currentArea = undefined;
+let game;
+setupPage();
+let numArr;
+let field;
 // login1 = "Иван";
 // login2 = "Денис";
-// let canIMove = false;
-// let isSecondPlayerConnect = false;
-startGame();
+let canIMove = false;
+// startGame();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

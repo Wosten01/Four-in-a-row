@@ -46,6 +46,10 @@ public class GameService {
         return game;
     }
 
+    public Game getGame(String gameId){
+        return GameStorage.getInstance().getGames().get(gameId);
+    }
+
     public Game connectToGame(Player player, String gameId) throws InvalidParamException, InvalidGameException {
         if (!GameStorage.getInstance().getGames().containsKey(gameId)){
             throw new InvalidParamException("Game with provided ID doesn't exists");
@@ -112,13 +116,11 @@ public class GameService {
         if (game.getStatus().equals(FINISHED)) {
             throw new InvalidGameException("Game is already finished");
         }
-        ArrayList<int[]> coordinates = lastChanges.getCoordinates();
+        ArrayList<Integer> coordinates = lastChanges.getCoordinates();
 
         int chip = lastChanges.getPlayerNum();
         int[][] field = game.getField();
-        for (int[] coordinate : coordinates) {
-            field[coordinate[0]][coordinate[1]] = chip;
-        }
+        field[coordinates.get(0)][coordinates.get(1)] = chip;
 //        Boolean xWinner = checkWinner(game.getBoard(), TicToe.X);
 //        Boolean oWinner = checkWinner(game.getBoard(), TicToe.O);
 //

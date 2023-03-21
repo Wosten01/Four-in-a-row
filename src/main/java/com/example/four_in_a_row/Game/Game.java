@@ -1,8 +1,6 @@
 package com.example.four_in_a_row.Game;
 
 import lombok.Data;
-
-import java.util.ArrayList;
 @Data
 public class Game {
 
@@ -14,6 +12,7 @@ public class Game {
     private int[][] field;
     private int winner;
     private boolean winFlag;
+    private int currentPlayer;
     //Подумать как заполнить board заранее
 }
 

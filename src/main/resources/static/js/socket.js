@@ -1,4 +1,3 @@
-
 const url = 'http://localhost:8080';
 let stompClient;
 let gameId;
@@ -8,31 +7,29 @@ let login2;
 
 function connectToSocket(gameId){
     console.log("Connecting to the game");
-    let socket = new SockJS(url + "/gameplay");
+    let socket = new SockJS(url + "/ws");
     stompClient = Stomp.over(socket);
+    console.log(`/topic/waiting/${gameId}`);
     stompClient.connect({}, function (frame){
         console.log("connected to the frame: " + frame);
-
-        stompClient.subscribe("/player/game-progress/" + gameId, function (response){
+        stompClient.subscribe(`/topic/waiting/${gameId}`, function (response){
             let data = JSON.parse(response.body);
-            console.log(data);
-            // displayResponse(data);
+            // console.log(data);
+            displayResponse(data);
+            document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`;
+            window.location.href = `/game/${gameId}`;
         });
-        window.location.href = "/game/" + gameId;
         }
         , function (error){
             console.log(error)
         }
     )
 }
-
+function displayResponse(data) {
+    alert(`Game started\n${data.player1.login} VS ${data.player2.login}`)
+}
 
 function createGame(login){
-    // let login = document.getElementById("login").value;
-    // if (login == null || login === ""){
-    //     alert("Please enter login");
-    // }
-    // else{
         $.ajax({
             url: url + "/start",
             type: "POST",
@@ -54,15 +51,9 @@ function createGame(login){
                 console.log(error);
             }
         })
-    // }
 }
 
 function connectToRandom(login){
-    // let login = document.getElementById("login").value;
-    // if (login == null || login === ""){
-    //     alert("Please enter login");
-    // }
-    // else{
         $.ajax({
             url: url + "/connect/random",
             type: "POST",
@@ -73,32 +64,21 @@ function connectToRandom(login){
             }),
             success: function (data){
                 gameId = data.id;
-                // console.log(game);
                 playerNum = 2;
-                //Возможно что-то добавить
                 connectToSocket(gameId);
-                // console.log(data.player1.login);
                 alert("You're playing with:" +  data.player1.login);
-                isSecondPlayerConnect = true;
+                displayResponse(data);
+                window.location.href = "/game/" + gameId;
+                document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`;
             },
             error: function (error){
                 alert("Something goes wrong, check console!");
                 console.log(error);
             }
         })
-    // }
 }
-
+// TODO: Проверить работоспособность функции
 function connectToSpecificGame(login, gameId){
-    // let login = document.getElementById("login").value;
-    // if (login == null || login === ""){
-    //     alert("Please enter login");
-    // }
-    // else{
-        // let gameId = document.getElementById("gameId").value;
-        // if (gameId == null || gameId === ""){
-        //     alert("Please enter the Game ID!");
-        // }
         $.ajax({
             url: url + "/connect",
             type: "POST",
@@ -112,20 +92,18 @@ function connectToSpecificGame(login, gameId){
             }),
             success: function (data){
                 gameId = data.id;
-                playerNum = 2;
-                //Возможно что-то добавить
+                // playerNum = 2;
                 connectToSocket(gameId);
                 alert("You're playing with:" +  data.player1.login);
                 isSecondPlayerConnect = true;
-                //Продумать этот момент
-                // startGame(data.id, data.player1.login, data.player2.login);
+                window.location.href = "/game/" + gameId;
+                document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`;
                 },
             error: function (error){
                 alert("Something goes wrong, check console!");
                 console.log(error);
             }
         })
-    // }
 }
 
 // TODO:Доделать Split Screen
@@ -144,10 +122,7 @@ function connectToSplitScreenGame(login1, login2){
             }
         }),
         success: function (data){
-            // gameId = data.id;
-            playerNum = 2;
-            //Возможно что-то добавить
-            // connectToSocket(gameId);
+            // playerNum = 2;
             alert("${data.player1.login} VS ${data.player1.login}");
             isSecondPlayerConnect = true;
             //Продумать этот момент
@@ -188,7 +163,4 @@ function enterSecondNameForSplitScreenGame(login1) {
         connectToSplitScreenGame(login1, login2);
     }
 }
-
-
-
 

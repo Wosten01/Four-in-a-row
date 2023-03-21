@@ -1,5 +1,6 @@
 package com.example.four_in_a_row.Game;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

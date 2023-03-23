@@ -9,6 +9,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" type="text/javascript"></script>
         <!--    end libs for stomp and sockjs-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" type="text/javascript"></script>
+
         <title>Four in a row/g</title>
     </head>
 <body>
@@ -65,13 +66,14 @@
        </div>
    </div>
 
-
-
    <div id="return">
        <a href="greeting.html">Return to menu</a>
    </div>
 
-    <script type="text/javascript"  th:src="@{/js/gameplay.js}"></script>
+<!--    <script type="text/javascript"  th:src="@{/js/gameplay.js}"></script>-->
+    <script  th:src="@{/js/gameplay.js}" type="text/javascript"></script>
+<!--   <script  th:src="@{/js/player.js}" type="module"></script>-->
+<!--   <script  th:src="@{/js/gameplay.js}" type="module"></script>-->
 <!--   <script type="text/javascript"  src="/static/js/gameplay.js"></script>-->
 <!--   src="/static/js/gameplay.js"-->
 </body>

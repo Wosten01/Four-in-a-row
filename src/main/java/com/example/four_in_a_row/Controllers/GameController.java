@@ -10,12 +10,9 @@ import com.example.four_in_a_row.Services.GameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @Controller
 @Slf4j
@@ -72,21 +69,30 @@ public class GameController {
 //
     @ResponseBody
     @PostMapping("/connect/random")
-    public ResponseEntity<String> connectToRandom(@RequestBody Player player) throws InvalidGameException {
+    public ResponseEntity<Game> connectToRandom(@RequestBody Player player) throws InvalidGameException {
         log.info("Connect random: {}", player);
 //        log.info();
         Game game = gameService.connectToRandomGame(player);
         // TODO: Переделать чтобы возвращала чисто id или убрать совсем возвращаемое значение
         simpMessagingTemplate.convertAndSend("/topic/waiting/" + game.getId(), game);
         log.info("Send Message: {} to /topic/waiting/{}", game, game.getId());
-        return ResponseEntity.ok("Game created");
+        return ResponseEntity.ok(game);
+    }
+    // TODO: Убрать game из responseEntity
+    @ResponseBody
+    @PostMapping("/gameplay/{id}")
+    public ResponseEntity<Game> gameplay (@RequestBody LastChanges request, @PathVariable String id) throws InvalidGameException, InvalidParamException {
+        log.info("gameplay: {}", request);
+        Game game = gameService.changePlayer(request);
+        simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getId(), game);
+        return ResponseEntity.ok(game);
     }
 
     @ResponseBody
-    @PostMapping("/gameplay")
-    public ResponseEntity<Game> gameplay (@RequestBody LastChanges request) throws InvalidGameException, InvalidParamException {
-        log.info("gameplay: {}", request);
-        Game game = gameService.changePlayer(request);
+    @PostMapping("/restart/{id}")
+    public ResponseEntity<Game> restart (@PathVariable String id) throws InvalidGameException, InvalidParamException {
+        log.info("restart game: {}",id);
+        Game game = gameService.restart(id);
         simpMessagingTemplate.convertAndSend("/topic/gameplay/" + game.getId(), game);
         return ResponseEntity.ok(game);
     }

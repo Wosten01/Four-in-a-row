@@ -13,6 +13,10 @@ public class Game {
     private int winner;
     private boolean winFlag;
     private int currentPlayer;
+
+    public void nextPlayer() {
+        this.currentPlayer = (this.currentPlayer + 1 < 3) ? ++this.currentPlayer : 1;
+    }
     //Подумать как заполнить board заранее
 }
 

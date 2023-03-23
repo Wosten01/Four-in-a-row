@@ -1,9 +1,16 @@
 const url = 'http://localhost:8080';
 let stompClient;
 let gameId;
-let playerNum;
 let login1;
 let login2;
+
+
+function setCookie(gameId, playerNum){
+    // document.cookie = `id=${gameId}; playerTurn=${playerTurn}; domain=/game/${gameId}; max-age=600; path=/game/${gameId}`;
+    //domain=localhost:8080/game/${gameId}
+    document.cookie = `id=${gameId}; max-age=600; path=/game/${gameId}`;
+    document.cookie = `playerNum=${playerNum}; max-age=600; path=/game/${gameId}`;
+}
 
 function connectToSocket(gameId){
     console.log("Connecting to the game");
@@ -14,9 +21,10 @@ function connectToSocket(gameId){
         console.log("connected to the frame: " + frame);
         stompClient.subscribe(`/topic/waiting/${gameId}`, function (response){
             let data = JSON.parse(response.body);
-            // console.log(data);
             displayResponse(data);
-            document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`;
+            // document.cookie = `id=${gameId}; max-age=600; path=/game/${gameId}`;
+            setCookie(gameId, 1);
+            // alert(document.cookie.toString());
             window.location.href = `/game/${gameId}`;
         });
         }
@@ -68,8 +76,9 @@ function connectToRandom(login){
                 connectToSocket(gameId);
                 alert("You're playing with:" +  data.player1.login);
                 displayResponse(data);
+                setCookie(gameId, 2);
                 window.location.href = "/game/" + gameId;
-                document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`;
+                // alert(document.cookie);
             },
             error: function (error){
                 alert("Something goes wrong, check console!");
@@ -95,9 +104,11 @@ function connectToSpecificGame(login, gameId){
                 // playerNum = 2;
                 connectToSocket(gameId);
                 alert("You're playing with:" +  data.player1.login);
-                isSecondPlayerConnect = true;
-                window.location.href = "/game/" + gameId;
-                document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`;
+                // isSecondPlayerConnect = true;
+                setCookie(gameId, 2);
+                // window.location.href = "/game/" + gameId;
+                // document.cookie = `id=${gameId}; max-age=300; path=/game/${gameId}`
+                // document.cookie = `id=${gameId};playerTurn=2; max-age=600; path=/game/${gameId}`;
                 },
             error: function (error){
                 alert("Something goes wrong, check console!");
@@ -122,7 +133,6 @@ function connectToSplitScreenGame(login1, login2){
             }
         }),
         success: function (data){
-            // playerNum = 2;
             alert("${data.player1.login} VS ${data.player1.login}");
             isSecondPlayerConnect = true;
             //Продумать этот момент
@@ -134,8 +144,6 @@ function connectToSplitScreenGame(login1, login2){
         }
     })
 }
-
-
 
 function enterName(connect) {
     let login = prompt("Please, enter your name:", "Player");

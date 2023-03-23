@@ -61,6 +61,7 @@ public class GameService {
         }
         game.setPlayer2(player);
         game.setStatus(IN_PROGRESS);
+        game.setCurrentPlayer(1);
         GameStorage.getInstance().setGame(game);
         //Чекнуть нужно ли
         return game;
@@ -73,6 +74,7 @@ public class GameService {
         game.setPlayer2(player);
         game.setStatus(IN_PROGRESS);
         GameStorage.getInstance().setGame(game);
+        game.setCurrentPlayer(1);
         return game;
     }
 
@@ -82,6 +84,7 @@ public class GameService {
         game.setId(SubWithDigitsAndLetters(4));
         game.setPlayer1(player1);
         game.setPlayer2(player2);
+        game.setCurrentPlayer(1);
         game.setStatus(IN_PROGRESS);
 //        GameStorage.getInstance().setGame(game);
         return game;
@@ -113,31 +116,26 @@ public class GameService {
         }
 
         Game game = GameStorage.getInstance().getGames().get(id);
+        // TODO: Подумать куда можно перенести Finished
         if (game.getStatus().equals(FINISHED)) {
             throw new InvalidGameException("Game is already finished");
         }
         ArrayList<Integer> coordinates = lastChanges.getCoordinates();
 
         int chip = lastChanges.getPlayerNum();
+        //TODO: Переделать
         int[][] field = game.getField();
         field[coordinates.get(0)][coordinates.get(1)] = chip;
-//        Boolean xWinner = checkWinner(game.getBoard(), TicToe.X);
-//        Boolean oWinner = checkWinner(game.getBoard(), TicToe.O);
-//
+
         if (checkWinner(field, chip)) {
             game.setWinner(chip);
             game.setWinFlag(true);
         }
+        game.nextPlayer();
 //        game.setWinFlag(true);
         GameStorage.getInstance().setGame(game);
         return game;
     }
-
-//    public Game changePlayer(){
-//
-//    }
-
-
     private boolean checkWinner(int[][] nums, int chip){
         int c = 0;
         //Проход по массиву по горизонталям
@@ -250,4 +248,16 @@ public class GameService {
     // Правильно обработать ре фреш
     private static final int row = 6;
     private static final int col = 7;
+
+    public Game restart(String id) throws InvalidParamException {
+        if (!GameStorage.getInstance().getGames().containsKey(id)) {
+            throw new InvalidParamException("Game not found");
+        }
+        Game game = GameStorage.getInstance().getGames().get(id);
+        game.setField(new int[row][col]);
+        game.setWinner(0);
+        game.setWinFlag(false);
+        game.nextPlayer();
+        return game;
+    }
 }

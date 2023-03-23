@@ -1,6 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*                                ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ И КОНСТАНТ                                        */
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 canvas.width = 850;
@@ -19,11 +16,24 @@ const squareSideHalf = squareSide / 2;
 const diameter = 2 * radius;
 const leftRectIndent = squareSideHalf - radius;
 const rightRectIndent = leftRectIndent + diameter;
-
 const indentY = (canvasH - row * squareSide) / 2;
 const edge = radius * 0.7;
 // Поменять
 let limit = 1;
+
+let currentArea = undefined;
+let game;
+let numArr;
+let field;
+let canIMove = false;
+
+console.log(document.cookie)
+console.log(document.cookie.split(";")[0].split("=")[1])
+console.log(document.cookie.split(";")[1].split("=")[1])
+const gameId = document.cookie.split(";")[0].split("=")[1];
+let pageNum = parseInt(document.cookie.split(";")[1].split("=")[1]);
+// console.log(document.cookie)*/
+setupPage(gameId, pageNum);
 
 // const playerColor1 = "rgba(245,245,245,1)";
 // const playerColor1 = "rgb(129,238,121)";
@@ -164,7 +174,29 @@ function drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineCol
         y += squareSide;
     }
     ctx.strokeStyle = lineColor;
-    return [arrayRect, num];
+    return arrayRect;
+}
+
+function updateTable(numArr){
+    // console.log("FIELD:")
+    // console.log(field)
+    // console.log("ARRAY")
+    // console.log(numArr)
+
+    for(let i = 0; i < numArr.length; i++){
+        for (let j = 0; j < numArr[0].length; j++) {
+            let elem = numArr[i][j]
+            if (elem !== 0 && field[i][j].busy === 0){
+                field[i][j].busy = elem;
+                drawChip(field[i][j].x1, field[i][j].y1 , radius, diameter, game.playersList[elem - 1].color);
+                console.log(`element changed - [${i}][${j}] = ${elem}`)
+            }
+        }
+    }
+    // console.log("FIELD CHanged:")
+    // console.log(field)
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,7 +335,7 @@ function drawAndFallChip(chip, area, color){
 }
 
 canvas.onmousemove = function (e) {
-    if (game !== undefined) {
+    if (game !== undefined && canIMove) {
         let x = e.pageX - canvas.offsetLeft;
         let y = e.pageY - canvas.offsetTop;
 
@@ -314,7 +346,8 @@ canvas.onmousemove = function (e) {
                 drawOrClearChip(true, newCurrArea, x, y);
                 currentArea = newCurrArea;
             }
-        } else {
+        }
+        else {
             if (!inAreaAndEmpty(currentArea, x, y)) {
                 drawOrClearChip(false, currentArea);
                 currentArea = undefined;
@@ -324,7 +357,7 @@ canvas.onmousemove = function (e) {
 }
 
 canvas.onmousedown = function () {
-    if (game !== undefined) {
+    if (game !== undefined && canIMove) {
         if (game.player.numOfMoves < limit && currentArea !== undefined) {
             drawAndFallChip(game.player.chip, currentArea, game.player.color);
         }
@@ -332,7 +365,7 @@ canvas.onmousedown = function () {
 }
 
 canvas.ondblclick = function (e){
-    if (game !== undefined) {
+    if (game !== undefined && canIMove) {
         clearSelection();
         if (game.player.lastPos.i !== -1 && game.player.lastPos.j !== -1) {
             let x = e.pageX - canvas.offsetLeft;
@@ -365,23 +398,26 @@ class Player {
     constructor(name, chip, color) {
         this.name = name;
         this.chip = chip;
-        this.winFlag = false;
+        // this.winFlag = false;
         this.winRating = 0;
         //Использую, но почему-то ругается
         this.lastPos = {i: -1, j: -1};
         this.numOfMoves = 0;
         this.color = color;
     }
-}
 
+    getColor(){
+        return this.color
+    }
+}
 class Game {
-    constructor(id, numArr) {
-        this.id = id;
+    constructor(numArr) {
         this.playersList = [];
         this.player = undefined;
         this.playerNum = undefined;
         this.nums = numArr;
         this.hasWinner = false;
+        this.winner = undefined;
     }
 
     getPlayerNum(){
@@ -393,14 +429,21 @@ class Game {
         return this.playerNum;
     }
 
-    setupGame(login1, login2){
-        this.player = new Player(login1, 1, playerColor1);
-        this.getPlayerNum();
-        this.playersList.push(this.player);
-        this.playersList.push(new Player(login2, 2, playerColor2));
-        // console.log(game);
-        let player1 = game.playersList[0];
-        let player2 = game.playersList[1];
+    setupGame(login1, login2, pageNum, numArr){
+        // this.getPlayerNum(currentPlayer);
+        let player1 = new Player(login1, 1, playerColor1)
+        let player2 = new Player(login2, 2, playerColor2)
+        this.playersList.push(player1);
+        this.playersList.push(player2);
+        this.player = game.playersList[game.playerNum - 1];
+        console.log((pageNum === game.playerNum).toString())
+        console.log(`currentPlayer =${pageNum}`)
+        updateTable(numArr)
+        canPlayerOnPageMove();
+        // currentPlayer
+        console.log(`Current Player who can move - ${game.playerNum}\nCurrent Player on page ${pageNum}`);
+
+        document.getElementById("currentPlayer").innerText = `Current player: ${game.playersList[game.playerNum - 1].name}`;
 
         document.getElementById("firstPlayerColor").innerHTML = `${player1.name}'s color`;
         document.getElementById("firstPlayerColor").style.backgroundColor = player1.color;
@@ -408,183 +451,66 @@ class Game {
         document.getElementById("secondPlayerColor").innerHTML = `${player2.name}'s color:`;
         document.getElementById("secondPlayerColor").style.backgroundColor = player2.color;
 
-        document.getElementById("currentPlayer").innerText = `Current player: ${game.player.name}`;
         // document.getElementById("currentPlayer").style.backgroundColor = game.player.color;
 
         document.getElementById("firstPlayerWins").innerHTML = `${player1.name}'s wins: ${player1.winRating}`
         document.getElementById("secondPlayerWins").innerHTML = `${player2.name}'s wins: ${player2.winRating}`
+
+        console.log(`Game was setup:\n`)
+        console.log(game)
     }
 
     changePlayers(){
-        // console.log("change");
         if (this.hasWinner){
             this.win();
+            return;
         }
-        else if (this.checkWinner(this.nums, this.player.chip)){
-            //Добавить появление кнопки рестарта
-            toVisible(document.getElementById("RestartButton"));
-            this.hasWinner = true;
-            this.player.winFlag = true;
-            this.player.lastPos = {i: -1, j: -1};
-            this.player.winRating += 1;
-            document.getElementById("firstPlayerWins").innerHTML = `${game.playersList[0].name}'s wins: ${game.playersList[0].winRating}`
-            document.getElementById("secondPlayerWins").innerHTML = `${game.playersList[1].name}'s wins: ${game.playersList[1].winRating}`
-            this.block();
-            this.win();
+        if (!canIMove){
+            alert("Please wait for your opponent move!")
+            return;
+        }
+        if (this.player.numOfMoves === 0){
+            alert("You don't move. Please do it")
+            return;
         }
         else {
-            this.player.numOfMoves = 0;
-            this.player.lastPos = {i: -1, j: -1};
-            this.player = this.playersList[this.getNextPlayerNum()];
-            if (currentArea !== undefined){
-                drawOrClearChip(false, currentArea);
-                drawOrClearChip(true, currentArea);
-            }
-            document.getElementById("currentPlayer").innerText = `Current player: ${game.player.name}`;
-            // document.getElementById("currentPlayer").style.backgroundColor = game.player.color;
-            //Прописать проверку на цвет, чтобы если необходимо сменить цвет
-        }
-        console.log( game);
-
-        //Здесь отсылать на сервер, если нет ошибок,
-        // продолжить смену игроков и игру,
-        // иначе вывести баннер победителя, засчитать очко
-        // убрать поле и предложить сыграть снова
-        // this.num = returned num;
-    }
-
-    block(){
-        for(let i = 0; i < row; i++){
-            for (let j = 0; j < col; j++){
-                if (field[i][j].busy === 0){
-                    field[i][j].busy = -1;
+            $.ajax({
+                url: url + `/gameplay/${gameId}`,
+                type: "POST",
+                dataType: "JSON",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "gameId" : gameId,
+                    "playerNum" : game.playerNum,
+                    "coordinates": [game.player.lastPos.i, game.player.lastPos.j]
+                }),
+                success: function (data){
+                    console.log(data)
+                    console.log("The move is passed to the opponent")
+                    // TODO:ОБРАБОТКА ПОБЕДЕТЕЛЯ
+                },
+                error: function (error){
+                    alert("Something goes wrong, check console! GAMEPLAY");
+                    console.log(error);
                 }
-            }
+            })
         }
+        console.log(game);
     }
 
-    // Сделать более оптимизированную проверку диагоналей (в целом и так норм, можно и забить)
-    //Обработать ничью
-//     checkWinner(nums, chip){
-//         let c = 0;
-//         //Проход по массиву по горизонталям
-//         for (let i = 0; i < row; i++) {
-//             let j = 0;
-//             while (j < col && col - j + c >= 4) {
-//                 if (chip === nums[i][j]){
-//                     c++;
-//                     if (c === 4){
-//                         console.log("Г")
-//                         return true;
-//                     }
-//                 }
-//                 else{
-//                     c = 0;
-//                 }
-//                 j++;
-//             }
-//             j = 0;
-//             c = 0;
-//         }
-//         //Проход по массиву по вертикали
-//         for (let j = 0; j < col; j++) {
-//             let i = row - 1;
-//             while (i >= 0 && c + i + 1 >= 4) {
-//                 if (chip === nums[i][j]){
-//                     c++;
-//                     if (c === 4){
-//                         c = 0;
-//                         console.log("В");
-//                         return true;
-//                     }
-//                 }
-//                 else {
-//                     c = 0;
-//                 }
-//                 i--;
-//             }
-//             i = row - 1;
-//             c = 0;
-//         }
-//
-//         //Проход по массиву по диагонали от левого края
-//         let j = 0;
-//         let i = row / 2;
-//         let k;
-//         let m;
-//         c = 0;
-//         while(j < (col - 1) / 2){
-//
-//             if (i > 0){
-//                 i--;
-//             }
-//             else{
-//                 j++;
-//             }
-//             k = i;
-//             m = j;
-//             while (k < row && m < col){
-//                 if (chip === nums[k][m]){
-//                     c++;
-//                     if (c === 4){
-//                         console.log("ПД");
-//                         return true
-//                     }
-//                 }
-//                 else{
-//                     c = 0;
-//                 }
-//                 k++;
-//                 m++;
-//             }
-//             c = 0;
-//         }
-//
-//         //Проход по массиву по диагонали от правого края
-//         i = row / 2;
-//         j = col - 1;
-//         while(j > (col - 1) / 2 ){
-//             if (i > 0){
-//                 i--;
-//             }
-//             else{
-//                 j--;
-//             }
-//             k = i;
-//             m = j;
-//             while (k < row && m >= 0){
-//                 if (chip === nums[k][m]){
-//                     c++;
-//                     if (c === 4){
-//                         console.log("ОД");
-//                         return true
-//                     }
-//                 }
-//                 else{
-//                     c = 0;
-//                 }
-//                 k++;
-//                 m--;
-//             }
-//             c = 0;
-//         }
-//         return false;
-//     }
-//
-//     //Переработать функцию, скорее всего нужно будет это сделать
-//     // уже после подключения к spring boot
-//     win(){
-//         this.banner()
-//     }
-//
-//     banner(){
-//         if (game.player.winFlag){
-//             alert(`Congratulations, ${game.player.name}, you are Winner`)
-//         }
-//         else {
-//             alert(`Sorry, ${game.player.name}, but you lose`)
-//         }
-//     }
+    win(){
+        if (game.winner === pageNum){
+            alert(`Congratulations, ${game.player.name}, you are Winner`)
+        }
+        else {
+            alert(`Sorry, ${game.player.name}, but you lose`)
+        }
+        toVisible(document.getElementById("RestartButton"));
+        // this.player.lastPos = {i: -1, j: -1};
+        // this.player.winRating += 1;
+//             document.getElementById("firstPlayerWins").innerHTML = `${game.playersList[0].name}'s wins: ${game.playersList[0].winRating}`
+//             document.getElementById("secondPlayerWins").innerHTML = `${game.playersList[1].name}'s wins: ${game.playersList[1].winRating}`
+    }
 }
 
 function clearCanvas(ctx, rect, num) {
@@ -599,31 +525,50 @@ function clearCanvas(ctx, rect, num) {
             num[i][j] = 0;
         }
     }
-    let player;
-    for (let i = 0; i < game.playersList.length; i++) {
-        player = game.playersList[i];
-        if (!player.winFlag) {
-            game.player = player;
-            //Я думаю это стоит переписать
-            game.getPlayerNum();
-        }
-        player.winFlag = false;
-        player.lastPos = {i: -1, j: -1};
-        player.numOfMoves = 0;
-    }
+    // let player;
+    // for (let i = 0; i < game.playersList.length; i++) {
+    //     player = game.playersList[i];
+    //     if (!player.winFlag) {
+    //         game.player = player;
+    //         //Я думаю это стоит переписать
+    //         game.getPlayerNum();
+    //     }
+    //     player.winFlag = false;
+    //     player.lastPos = {i: -1, j: -1};
+    //     player.numOfMoves = 0;
+    // }
 
 }
 
-function startGame(id, login1, login2) {
-    [field, numArr] = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
-    game = new Game(id, numArr);
-    game.setupGame(login1, login2);
+function startGame(login1, login2, currentPlayer, pageNum, numArr) {
+    // console.log(currentPlayer);
+    field = drawTable(ctx, radius,  squareSide, squareSideHalf, fieldColor, lineColor);
+    console.log(field)
+    game = new Game(numArr);
+    game.playerNum = currentPlayer
+    game.setupGame(login1, login2, pageNum, numArr);
 }
 
 function restartGame(){
     clearCanvas(ctx, field, game.nums);
-    // console.log("Restart Game");
     console.log(game);
+    $.ajax({
+        url: url + `/restart/${gameId}`,
+        type: "POST",
+        dataType: "JSON",
+        contentType: "application/json",
+        success: function(data) {
+            console.log(data)
+            // console.log(`${data.player1.login}, ${data.player2.login}`)
+            // console.log("DATA FROM SERVER")
+            // console.log(data)
+            // startGame(data.player1.login, data.player2.login, data.currentPlayer, pageNum, data.field);
+        },
+        error: function (error){
+            alert("Something goes wrong, check console!");
+            console.log(error);
+        }
+    });
 }
 
 function toHide(elem){
@@ -634,11 +579,11 @@ function toVisible(elem) {
     elem.style.display = "inline-block"
 }
 
-function setupPage(){
-    let cookies = document.cookie.split(";");
-    console.log(cookies);
+function setupPage(gameId){
+    // let cookies = document.cookie.split(";");
+    // console.log(cookies);
     console.log("Gameplay connecting");
-    gameId = cookies[0].split("=")[1];
+    // gameId = cookies[0].split("=")[1];
     console.log(gameId);
     let socket = new SockJS(url + "/ws");
     stompClient = Stomp.over(socket);
@@ -647,7 +592,22 @@ function setupPage(){
             console.log("connected to the frame: " + frame);
             stompClient.subscribe(`/topic/gameplay/${gameId}`, function (response){
                 let data = JSON.parse(response.body);
+                if (data.winFlag){
+                    game.hasWinner = true;
+                    game.winner = data.winner;
+                    game.win();
+                }
                 console.log(data);
+                game.player.numOfMoves = 0;
+                game.player.lastPos = {i : -1, j : -1};
+                game.nums = data.field;
+                console.log(game.nums)
+                console.log(data.field)
+                updateTable(data.field);
+                game.playerNum = data.currentPlayer
+                game.player = game.playersList[game.playerNum - 1]
+                canPlayerOnPageMove()
+                console.log("{}")
             });
         }
         , function (error){
@@ -660,10 +620,10 @@ function setupPage(){
         dataType: "JSON",
         contentType: "application/json",
         success: function(data) {
-            // console.log(`help${response.toString()}`);
-            // let data = JSON.parse(response.body)
             console.log(`${data.player1.login}, ${data.player2.login}`)
-            startGame(0, data.player1.login, data.player2.login);
+            console.log("DATA FROM SERVER")
+            console.log(data)
+            startGame(data.player1.login, data.player2.login, data.currentPlayer, pageNum, data.field);
         },
         error: function (error){
             alert("Something goes wrong, check console!");
@@ -672,15 +632,18 @@ function setupPage(){
     });
 }
 
-let currentArea = undefined;
-let game;
-setupPage();
-let numArr;
-let field;
-// login1 = "Иван";
-// login2 = "Денис";
-let canIMove = false;
-// startGame();
+function canPlayerOnPageMove() {
+    if (pageNum === game.playerNum && !game.hasWinner){
+        canIMove = true;
+        console.log(`${pageNum} can move`)
+    }
+    else{
+        canIMove = false;
+        console.log(`${pageNum} can't move`)
+    }
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                                  КОНЕЦ ФАЙЛА                                                       */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -702,4 +665,5 @@ let canIMove = false;
       Hotkey:
         Ctrl+Shift+F7
         Ctrl+Shift+I - for images
+        TODO: Очищать поле от случайных фишек, при запрете мува
 */
